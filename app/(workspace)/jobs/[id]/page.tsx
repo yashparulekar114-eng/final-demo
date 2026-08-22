@@ -126,7 +126,7 @@ export default async function JobDetailPage({
             </>
           ) : null}
           {live ? (
-            <div className="card-quiet p-6">
+            <div id="apply" className="card-quiet p-6 scroll-mt-24">
               <h2 className="text-sm font-semibold mb-4">Apply</h2>
               <ApplyButton
                 jobId={live.id}
@@ -135,7 +135,18 @@ export default async function JobDetailPage({
                 hasResume={hasResume}
               />
             </div>
-          ) : null}
+          ) : (
+            <div id="apply" className="card-quiet p-6 scroll-mt-24 space-y-3">
+              <h2 className="text-sm font-semibold">Apply</h2>
+              <p className="text-sm text-muted">
+                This is a sample listing. To submit a resume, open a posted job from
+                the board (roles with an Apply button).
+              </p>
+              <Link href="/jobs" className="btn-primary">
+                Browse jobs to apply
+              </Link>
+            </div>
+          )}
         </div>
         <aside className="w-full lg:w-72 space-y-4">
           {mock ? (

@@ -35,7 +35,7 @@ const NAV = [
 
 const MOBILE = [
   { href: "/dashboard", label: "Home", icon: LayoutDashboard },
-  { href: "/jobs", label: "Jobs", icon: Briefcase },
+  { href: "/jobs", label: "Apply", icon: Briefcase },
   { href: "/candidates", label: "People", icon: Users },
   { href: "/interviews", label: "Talks", icon: Calendar },
   { href: "/reports", label: "Stats", icon: BarChart3 },
@@ -214,6 +214,9 @@ function TopBar({
           </div>
         ) : null}
       </div>
+      <Link href="/jobs" className="btn-secondary hidden sm:inline-flex">
+        Apply to a job
+      </Link>
       <button type="button" className="btn-primary hidden sm:inline-flex" onClick={createJob.open}>
         <Plus className="h-4 w-4" />
         Create Job

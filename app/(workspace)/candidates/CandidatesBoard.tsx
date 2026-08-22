@@ -34,8 +34,11 @@ export default function CandidatesBoard({ initialQ }: { initialQ: string }) {
   return (
     <div className="max-w-7xl space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Candidates</h1>
-        <p className="text-sm text-muted mt-1">Search, filter, and open profiles.</p>
+        <h1 className="text-2xl font-semibold tracking-tight">People in pipeline</h1>
+        <p className="text-sm text-muted mt-1">
+          Recruiter view of candidates. To apply yourself, use Apply on the open
+          roles above.
+        </p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-6 gap-3">
         <label className="relative xl:col-span-2">

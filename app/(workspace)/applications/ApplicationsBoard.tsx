@@ -50,6 +50,9 @@ export default function ApplicationsBoard() {
           <p className="text-sm text-muted mt-1">Track every stage from applied to hired.</p>
         </div>
         <div className="flex gap-2">
+          <Link href="/jobs" className="btn-primary">
+            Apply to a job
+          </Link>
           <select className="field w-36" value={sort} onChange={(e) => setSort(e.target.value as "match" | "name")}>
             <option value="match">Sort: match</option>
             <option value="name">Sort: name</option>

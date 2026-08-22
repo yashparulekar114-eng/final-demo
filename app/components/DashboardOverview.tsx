@@ -47,13 +47,18 @@ export default function DashboardOverview({
 
   return (
     <div className="space-y-8 max-w-7xl">
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-ink">
-          {greeting()}, {name.split(" ")[0]}
-        </h1>
-        <p className="mt-1 text-sm text-muted">
-          Here&apos;s what&apos;s happening with your hiring pipeline.
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-ink">
+            {greeting()}, {name.split(" ")[0]}
+          </h1>
+          <p className="mt-1 text-sm text-muted">
+            Recruiters track the pipeline here. Candidates can apply to open roles.
+          </p>
+        </div>
+        <Link href="/jobs" className="btn-primary">
+          Apply to a job
+        </Link>
       </div>
 
       <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3">

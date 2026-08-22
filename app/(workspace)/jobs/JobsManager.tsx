@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Plus, Search } from "lucide-react";
 import { mockJobs, type JobStatus, type MockJob } from "@/lib/ats-data";
+import type { LiveJob } from "@/lib/loadLiveJobs";
 import { StatusBadge, EmptyState } from "../../components/ui";
 import { useCreateJob } from "../../components/CreateJobModal";
 
@@ -12,14 +13,6 @@ const statusTone: Record<JobStatus, "green" | "slate" | "amber" | "red"> = {
   Draft: "slate",
   Paused: "amber",
   Closed: "red",
-};
-
-export type LiveJob = {
-  id: string;
-  title: string;
-  description: string;
-  status: string;
-  created_at: string;
 };
 
 export default function JobsManager({
@@ -34,8 +27,10 @@ export default function JobsManager({
   const [status, setStatus] = useState<string>("All");
   const [page, setPage] = useState(0);
 
+  const liveIds = useMemo(() => new Set(liveJobs.map((j) => j.id)), [liveJobs]);
+
   const filtered = useMemo(() => {
-    const merged: MockJob[] = [
+    const merged: Array<MockJob & { canApply: boolean }> = [
       ...liveJobs.map((j) => ({
         id: j.id,
         title: j.title,
@@ -51,8 +46,9 @@ export default function JobsManager({
         requirements: [],
         skills: [],
         team: ["You"],
+        canApply: j.status !== "Closed",
       })),
-      ...mockJobs,
+      ...mockJobs.map((j) => ({ ...j, canApply: false })),
     ];
     return merged.filter((j) => {
       const hit = `${j.title} ${j.department} ${j.location}`.toLowerCase().includes(q.toLowerCase());
@@ -66,16 +62,18 @@ export default function JobsManager({
   const slice = filtered.slice(page * pageSize, page * pageSize + pageSize);
 
   return (
-    <div className="max-w-7xl space-y-6">
+    <div className="max-w-7xl space-y-6" id="apply-board">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Jobs</h1>
-          <p className="text-sm text-muted mt-1">Open roles, drafts, and closed reqs.</p>
+          <p className="text-sm text-muted mt-1">
+            Candidates: open a posted role and click Apply. Recruiters can also create jobs.
+          </p>
         </div>
         {signedIn ? (
           <div className="flex gap-2">
             <Link href="/jobs/new" className="btn-secondary">
-              Full form
+              Post a job
             </Link>
             <button type="button" className="btn-primary" onClick={create.open}>
               <Plus className="h-4 w-4" />
@@ -84,7 +82,7 @@ export default function JobsManager({
           </div>
         ) : (
           <Link href="/sign-in?redirect_url=%2Fjobs" className="btn-primary">
-            Sign in to post
+            Sign in to apply
           </Link>
         )}
       </div>
@@ -132,6 +130,7 @@ export default function JobsManager({
                   "Hiring manager",
                   "Status",
                   "Posted",
+                  "",
                 ].map((h) => (
                   <th key={h} className="px-4 py-2.5 font-medium">
                     {h}
@@ -156,6 +155,17 @@ export default function JobsManager({
                     <StatusBadge tone={statusTone[j.status]}>{j.status}</StatusBadge>
                   </td>
                   <td className="px-4 py-3 text-muted">{j.posted}</td>
+                  <td className="px-4 py-3">
+                    {j.canApply ? (
+                      <Link href={`/jobs/${j.id}#apply`} className="btn-primary text-xs">
+                        Apply
+                      </Link>
+                    ) : liveIds.has(j.id) ? (
+                      <span className="text-xs text-muted">Closed</span>
+                    ) : (
+                      <span className="text-xs text-muted">Sample</span>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
