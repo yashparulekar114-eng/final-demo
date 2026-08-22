@@ -72,17 +72,29 @@ export async function applyToJob(
     }
 
     const resume = formData.get("resume");
-    const hasResumeFile =
-      resume instanceof File && resume.size > 0;
+    if (!(resume instanceof File) || resume.size === 0) {
+      return {
+        failedStep: "upload",
+        error: "Please attach a PDF resume.",
+      };
+    }
 
-    let resumeUrl: string | null = null;
-    if (hasResumeFile) {
-      try {
-        resumeUrl = await uploadResumeToBucket(resume, user.id);
-      } catch (err) {
-        console.error("[applyToJob] Resume upload failed", serializeUnknown(err));
-        return applyError("upload", "Resume upload failed", err);
-      }
+    const looksLikePdf =
+      resume.type === "application/pdf" ||
+      resume.name.toLowerCase().endsWith(".pdf");
+    if (!looksLikePdf) {
+      return {
+        failedStep: "upload",
+        error: "Only PDF files are allowed.",
+      };
+    }
+
+    let resumeUrl: string;
+    try {
+      resumeUrl = await uploadResumeToBucket(resume, user.id);
+    } catch (err) {
+      console.error("[applyToJob] Resume upload failed", serializeUnknown(err));
+      return applyError("upload", "Resume upload failed", err);
     }
 
     try {
@@ -118,19 +130,17 @@ export async function applyToJob(
       }
 
       if (existing) {
-        if (resumeUrl) {
-          const { error: updateError } = await supabase
-            .from("applications")
-            .update({ resume_url: resumeUrl, status: "Applied" })
-            .eq("id", existing.id);
+        const { error: updateError } = await supabase
+          .from("applications")
+          .update({ resume_url: resumeUrl, status: "Applied" })
+          .eq("id", existing.id);
 
-          if (updateError) {
-            console.error(
-              "[applyToJob] Application update failed",
-              serializeUnknown(updateError),
-            );
-            return { failedStep: "database", error: updateError.message };
-          }
+        if (updateError) {
+          console.error(
+            "[applyToJob] Application update failed",
+            serializeUnknown(updateError),
+          );
+          return { failedStep: "database", error: updateError.message };
         }
         revalidatePath(`/jobs/${jobId}`);
         revalidatePath("/jobs");
@@ -139,19 +149,12 @@ export async function applyToJob(
         return { success: true };
       }
 
-      const insertPayload: {
-        job_id: string;
-        candidate_id: string;
-        status: string;
-        resume_url?: string;
-      } = {
+      const { error } = await supabase.from("applications").insert({
         job_id: jobId,
         candidate_id: user.id,
         status: "Applied",
-      };
-      if (resumeUrl) insertPayload.resume_url = resumeUrl;
-
-      const { error } = await supabase.from("applications").insert(insertPayload);
+        resume_url: resumeUrl,
+      });
 
       if (error) {
         console.error(
@@ -159,18 +162,20 @@ export async function applyToJob(
           serializeUnknown(error),
         );
         if (error.code === "23505") {
-          revalidatePath("/applications");
-          return { success: true };
-        }
-        if (error.message.includes("resume_url") && resumeUrl) {
-          const retry = await supabase.from("applications").insert({
-            job_id: jobId,
-            candidate_id: user.id,
-            status: "Applied",
-          });
-          if (retry.error) {
-            return { failedStep: "database", error: retry.error.message };
+          const { error: dupUpdateError } = await supabase
+            .from("applications")
+            .update({ resume_url: resumeUrl, status: "Applied" })
+            .eq("job_id", jobId)
+            .eq("candidate_id", user.id);
+          if (dupUpdateError) {
+            return { failedStep: "database", error: dupUpdateError.message };
           }
+        } else if (error.message.includes("resume_url")) {
+          return {
+            failedStep: "database",
+            error:
+              "Add resume_url by running the latest database-schema.sql in the Supabase SQL Editor.",
+          };
         } else {
           return { failedStep: "database", error: error.message };
         }

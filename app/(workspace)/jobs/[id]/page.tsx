@@ -56,19 +56,30 @@ export default async function JobDetailPage({
 
   const user = await currentUser();
   let alreadyApplied = false;
+  let hasResume = false;
   if (user && live) {
     try {
       const existing = await supabase
         .from("applications")
-        .select("id")
+        .select("id, resume_url")
         .eq("job_id", live.id)
         .eq("candidate_id", user.id)
         .maybeSingle();
-      if (!existing.error) {
+      if (existing.error?.message.includes("resume_url")) {
+        const fallback = await supabase
+          .from("applications")
+          .select("id")
+          .eq("job_id", live.id)
+          .eq("candidate_id", user.id)
+          .maybeSingle();
+        alreadyApplied = Boolean(fallback.data);
+      } else if (!existing.error) {
         alreadyApplied = Boolean(existing.data);
+        hasResume = Boolean(existing.data?.resume_url);
       }
     } catch {
       alreadyApplied = false;
+      hasResume = false;
     }
   }
 
@@ -110,11 +121,15 @@ export default async function JobDetailPage({
         className="rounded-xl border border-line bg-surface p-6 sm:p-8 scroll-mt-24 space-y-4"
       >
         <h2 className="text-lg font-semibold tracking-tight">Apply Now</h2>
+        <p className="text-sm text-muted">
+          Attach a PDF resume. Files are stored uniquely in the <code>resumes</code> bucket.
+        </p>
         {canApplyLive ? (
           <ApplyButton
             jobId={jobId}
             isSignedIn={Boolean(user)}
             alreadyApplied={alreadyApplied}
+            hasResume={hasResume}
           />
         ) : (
           <div className="space-y-3">
