@@ -4,6 +4,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { supabase } from "@/lib/supabase";
 import { uploadResumeToBucket } from "@/lib/uploadResume";
+import { sendApplicationReceivedEmail } from "@/lib/resend";
 
 export type ApplyState = {
   error?: string;
@@ -98,5 +99,26 @@ export async function applyToJob(
   revalidatePath(`/jobs/${jobId}`);
   revalidatePath("/jobs");
   revalidatePath("/dashboard");
+
+  const { data: job } = await supabase
+    .from("jobs")
+    .select("title")
+    .eq("id", jobId)
+    .maybeSingle();
+
+  const jobTitle = job?.title?.trim() || "open";
+
+  try {
+    await sendApplicationReceivedEmail(jobTitle);
+  } catch (err) {
+    return {
+      success: true,
+      error:
+        err instanceof Error
+          ? `Application saved, but the confirmation email failed: ${err.message}`
+          : "Application saved, but the confirmation email failed.",
+    };
+  }
+
   return { success: true };
 }

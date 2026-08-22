@@ -49,3 +49,14 @@ Run `database-schema.sql` in the SQL Editor whenever it changes. It creates:
 - public Storage bucket `resumes`
 
 If you skip this, posting jobs, applying, or uploading a PDF will fail.
+
+## Email (Resend)
+
+Add to `.env.local`:
+
+```
+RESEND_API_KEY=re_your_copied_key_here
+RESEND_TO_EMAIL=the_email_you_used_to_sign_up_at_resend.com
+```
+
+Free-tier Resend only delivers to that signup address. From address is `onboarding@resend.dev`. After a successful apply, we send **Application Received**.

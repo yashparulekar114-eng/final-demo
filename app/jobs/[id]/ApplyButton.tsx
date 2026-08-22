@@ -34,13 +34,20 @@ export default function ApplyButton({
 
   if (applied) {
     return (
-      <button
-        type="button"
-        disabled
-        className="inline-flex items-center justify-center w-full sm:w-auto px-8 py-3.5 rounded-xl bg-emerald-600 text-white font-semibold opacity-90 cursor-not-allowed"
-      >
-        Applied
-      </button>
+      <div className="space-y-3">
+        <button
+          type="button"
+          disabled
+          className="inline-flex items-center justify-center w-full sm:w-auto px-8 py-3.5 rounded-xl bg-emerald-600 text-white font-semibold opacity-90 cursor-not-allowed"
+        >
+          Applied
+        </button>
+        {state.error ? (
+          <p className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+            {state.error}
+          </p>
+        ) : null}
+      </div>
     );
   }
 
