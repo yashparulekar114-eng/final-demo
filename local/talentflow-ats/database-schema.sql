@@ -30,3 +30,31 @@ create policy "Anyone can insert jobs"
   on public.jobs
   for insert
   with check (true);
+
+-- Applications
+create table if not exists public.applications (
+  id uuid primary key default gen_random_uuid(),
+  job_id uuid not null references public.jobs (id) on delete cascade,
+  candidate_id text not null,
+  status text not null default 'Applied',
+  created_at timestamptz not null default now(),
+  constraint applications_status_check check (status in ('Applied', 'Interviewing', 'Rejected', 'Hired')),
+  constraint applications_job_candidate_unique unique (job_id, candidate_id)
+);
+
+create index if not exists applications_job_id_idx on public.applications (job_id);
+create index if not exists applications_candidate_id_idx on public.applications (candidate_id);
+
+alter table public.applications enable row level security;
+
+drop policy if exists "Anyone can read applications" on public.applications;
+create policy "Anyone can read applications"
+  on public.applications
+  for select
+  using (true);
+
+drop policy if exists "Anyone can insert applications" on public.applications;
+create policy "Anyone can insert applications"
+  on public.applications
+  for insert
+  with check (true);

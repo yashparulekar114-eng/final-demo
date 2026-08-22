@@ -38,12 +38,13 @@ Open [http://localhost:3000](http://localhost:3000) on the same computer.
 - Dashboard (signed in): `/dashboard`
 - Browse jobs: `/jobs`
 - Post a job (signed in): `/jobs/new`
+- Job details / apply: `/jobs/[id]`
 
 ## Database (Supabase)
 
-The `jobs` table does **not** exist until you run the schema.
+Run `database-schema.sql` in the SQL Editor whenever it changes. It creates:
 
-1. Open [Supabase](https://supabase.com/dashboard) → your project → **SQL Editor**
-2. Paste `database-schema.sql` and click **Run**
+- `jobs`
+- `applications`
 
-If you skip this, posting and listing jobs will fail (`PGRST205`).`
+If you skip this, posting jobs or clicking **Apply Now** will fail (`PGRST205`).
