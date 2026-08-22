@@ -1,188 +1,120 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
-import {
-  PIPELINE_STAGES,
-  mockCandidates,
-  type CandidateRecord,
-  type PipelineStage,
-} from "@/lib/ats-data";
-import { Avatar, EmptyState, StatusBadge } from "../../components/ui";
+import type { DashboardApplication } from "../dashboard/types";
+import { EmptyState, StatusBadge } from "../../components/ui";
 
-export default function ApplicationsBoard() {
-  const [view, setView] = useState<"table" | "board">("board");
-  const [sort, setSort] = useState<"match" | "name">("match");
-  const [columns, setColumns] = useState<Record<PipelineStage, CandidateRecord[]>>(() => {
-    const init = Object.fromEntries(PIPELINE_STAGES.map((s) => [s, [] as CandidateRecord[]])) as Record<
-      PipelineStage,
-      CandidateRecord[]
-    >;
-    for (const c of mockCandidates) init[c.stage].push(c);
-    return init;
-  });
-  const [confirm, setConfirm] = useState<CandidateRecord | null>(null);
+function tone(status: string): "green" | "slate" | "amber" | "indigo" | "red" {
+  if (status === "Hired") return "green";
+  if (status === "Rejected") return "red";
+  if (status === "Interviewing") return "amber";
+  if (status === "Applied") return "indigo";
+  return "slate";
+}
 
-  const tableRows = useMemo(() => {
-    const all = PIPELINE_STAGES.flatMap((s) => columns[s]);
-    return [...all].sort((a, b) =>
-      sort === "match" ? b.matchScore - a.matchScore : a.name.localeCompare(b.name),
-    );
-  }, [columns, sort]);
-
-  function onDrop(stage: PipelineStage, id: string) {
-    setColumns((prev) => {
-      const next = { ...prev };
-      for (const s of PIPELINE_STAGES) {
-        next[s] = prev[s].filter((c) => c.id !== id);
-      }
-      const found = mockCandidates.find((c) => c.id === id);
-      if (found) next[stage] = [...next[stage], { ...found, stage }];
-      return next;
-    });
+function ApplicationTable({
+  rows,
+  emptyTitle,
+  emptyBody,
+}: {
+  rows: DashboardApplication[];
+  emptyTitle: string;
+  emptyBody: string;
+}) {
+  if (rows.length === 0) {
+    return <EmptyState title={emptyTitle} body={emptyBody} />;
   }
 
   return (
-    <div className="max-w-[90rem] space-y-6">
+    <div className="overflow-x-auto rounded-xl border border-line bg-surface">
+      <table className="w-full text-sm min-w-[720px] text-left">
+        <thead className="text-xs text-muted border-b border-line">
+          <tr>
+            {["Role", "Candidate", "Status", "Applied", "Resume", ""].map((h) => (
+              <th key={h} className="px-4 py-2.5 font-medium">
+                {h}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.id} className="border-b border-line last:border-0">
+              <td className="px-4 py-3 font-medium">{row.job_title}</td>
+              <td className="px-4 py-3 text-muted font-mono text-xs">
+                {row.candidate_id}
+              </td>
+              <td className="px-4 py-3">
+                <StatusBadge tone={tone(row.status)}>{row.status}</StatusBadge>
+              </td>
+              <td className="px-4 py-3 text-muted">
+                {new Date(row.created_at).toLocaleString()}
+              </td>
+              <td className="px-4 py-3">
+                {row.resume_url ? (
+                  <a
+                    href={row.resume_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="btn-text text-xs"
+                  >
+                    PDF
+                  </a>
+                ) : (
+                  <span className="text-xs text-muted">—</span>
+                )}
+              </td>
+              <td className="px-4 py-3">
+                <Link href={`/jobs/${row.job_id}`} className="btn-text text-xs">
+                  Job
+                </Link>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+export default function ApplicationsBoard({
+  recruiterApplications,
+  candidateApplications,
+}: {
+  recruiterApplications: DashboardApplication[];
+  candidateApplications: DashboardApplication[];
+}) {
+  return (
+    <div className="max-w-6xl space-y-10">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Applications</h1>
-          <p className="text-sm text-muted mt-1">Track every stage from applied to hired.</p>
+          <p className="text-sm text-muted mt-1">
+            Live records from Supabase after a candidate clicks Apply Now.
+          </p>
         </div>
-        <div className="flex gap-2">
-          <Link href="/jobs" className="btn-primary">
-            Apply to a job
-          </Link>
-          <select className="field w-36" value={sort} onChange={(e) => setSort(e.target.value as "match" | "name")}>
-            <option value="match">Sort: match</option>
-            <option value="name">Sort: name</option>
-          </select>
-          <div className="flex rounded-xl border border-line p-0.5 bg-surface">
-            <button
-              type="button"
-              className={`px-3 py-1.5 text-sm rounded-lg ${view === "board" ? "bg-indigo-50 text-indigo-700" : "text-muted"}`}
-              onClick={() => setView("board")}
-            >
-              Board
-            </button>
-            <button
-              type="button"
-              className={`px-3 py-1.5 text-sm rounded-lg ${view === "table" ? "bg-indigo-50 text-indigo-700" : "text-muted"}`}
-              onClick={() => setView("table")}
-            >
-              Table
-            </button>
-          </div>
-        </div>
+        <Link href="/jobs" className="btn-primary">
+          Apply to a job
+        </Link>
       </div>
 
-      {view === "board" ? (
-        <div className="flex gap-3 overflow-x-auto pb-2">
-          {PIPELINE_STAGES.map((stage) => (
-            <section
-              key={stage}
-              className="min-w-[220px] w-56 shrink-0"
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={(e) => {
-                const id = e.dataTransfer.getData("text/plain");
-                if (id) onDrop(stage, id);
-              }}
-            >
-              <div className="flex items-center justify-between mb-2">
-                <h2 className="text-xs font-semibold uppercase tracking-wide text-muted">
-                  {stage}
-                </h2>
-                <span className="text-xs text-muted">{columns[stage].length}</span>
-              </div>
-              <div className="space-y-2 min-h-40 rounded-xl border border-dashed border-line p-1">
-                {columns[stage].map((c) => (
-                  <article
-                    key={c.id}
-                    draggable
-                    onDragStart={(e) => e.dataTransfer.setData("text/plain", c.id)}
-                    className="card-quiet p-3 cursor-grab active:cursor-grabbing"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Avatar name={c.name} size="sm" />
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium truncate">{c.name}</p>
-                        <p className="text-xs text-muted truncate">{c.jobTitle}</p>
-                      </div>
-                    </div>
-                    <p className="mt-2 text-xs text-muted">
-                      {c.matchScore}% · {c.experienceYears}y · {c.lastActivity}
-                    </p>
-                  </article>
-                ))}
-              </div>
-            </section>
-          ))}
-        </div>
-      ) : tableRows.length === 0 ? (
-        <EmptyState title="No applications" body="When candidates apply, they will land here." />
-      ) : (
-        <div className="overflow-x-auto card-quiet">
-          <table className="w-full text-sm min-w-[700px]">
-            <thead className="text-xs text-muted border-b border-line">
-              <tr>
-                {["Candidate", "Position", "Match", "Stage", "Recruiter", ""].map((h) => (
-                  <th key={h} className="px-4 py-2.5 text-left font-medium">
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {tableRows.map((c) => (
-                <tr key={c.id} className="border-b border-line last:border-0">
-                  <td className="px-4 py-3 font-medium">{c.name}</td>
-                  <td className="px-4 py-3 text-muted">{c.jobTitle}</td>
-                  <td className="px-4 py-3">{c.matchScore}%</td>
-                  <td className="px-4 py-3">
-                    <StatusBadge tone="indigo">{c.stage}</StatusBadge>
-                  </td>
-                  <td className="px-4 py-3 text-muted">{c.recruiter}</td>
-                  <td className="px-4 py-3">
-                    <Link href={`/candidates/${c.id}`} className="btn-text text-xs">
-                      Open
-                    </Link>
-                    <button
-                      type="button"
-                      className="ml-3 text-xs text-rose-600 hover:underline"
-                      onClick={() => setConfirm(c)}
-                    >
-                      Reject
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <section className="space-y-3">
+        <h2 className="text-sm font-semibold">Your applications</h2>
+        <ApplicationTable
+          rows={candidateApplications}
+          emptyTitle="You have not applied yet"
+          emptyBody="Open a posted job and click Apply Now."
+        />
+      </section>
 
-      {confirm ? (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-slate-900/30 p-4">
-          <div className="card-quiet max-w-sm w-full p-5">
-            <h3 className="font-semibold">Reject {confirm.name}?</h3>
-            <p className="mt-2 text-sm text-muted">
-              This is a demo confirmation. No email will be sent.
-            </p>
-            <div className="mt-4 flex justify-end gap-2">
-              <button type="button" className="btn-secondary" onClick={() => setConfirm(null)}>
-                Cancel
-              </button>
-              <button
-                type="button"
-                className="btn-primary bg-rose-600 hover:bg-rose-700"
-                onClick={() => setConfirm(null)}
-              >
-                Confirm
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
+      <section className="space-y-3">
+        <h2 className="text-sm font-semibold">Applicants on your jobs</h2>
+        <ApplicationTable
+          rows={recruiterApplications}
+          emptyTitle="No applicants yet"
+          emptyBody="When someone applies to a job you posted, they appear here."
+        />
+      </section>
     </div>
   );
 }
