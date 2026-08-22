@@ -12,52 +12,12 @@ import {
   FileText,
   CheckCircle2,
 } from "lucide-react";
+import SiteHeader from "./components/SiteHeader";
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col selection:bg-indigo-500 selection:text-white">
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="h-10 w-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-200 group-hover:scale-105 transition-transform duration-200">
-              <Briefcase className="w-5 h-5" />
-            </div>
-            <span className="text-xl font-bold tracking-tight text-slate-900">
-              Talent<span className="text-indigo-600">Flow</span>
-            </span>
-          </Link>
-
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
-            <a href="#features" className="hover:text-indigo-600 transition-colors">
-              Features
-            </a>
-            <a href="#how-it-works" className="hover:text-indigo-600 transition-colors">
-              How It Works
-            </a>
-            <a href="#for-recruiters" className="hover:text-indigo-600 transition-colors">
-              For Recruiters
-            </a>
-            <a href="#for-candidates" className="hover:text-indigo-600 transition-colors">
-              For Candidates
-            </a>
-          </nav>
-
-          <div className="flex items-center gap-3">
-            <a
-              href="#features"
-              className="text-sm font-semibold text-slate-700 hover:text-indigo-600 px-3 py-2 rounded-lg transition-colors"
-            >
-              Sign In
-            </a>
-            <a
-              href="#get-started"
-              className="hidden sm:inline-flex items-center justify-center text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg shadow-sm shadow-indigo-200 transition-all duration-200 hover:shadow"
-            >
-              Get Started
-            </a>
-          </div>
-        </div>
-      </header>
+      <SiteHeader />
 
       <main className="flex-grow">
         <section
@@ -87,22 +47,22 @@ export default function Home() {
             </p>
 
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto sm:max-w-none">
-              <a
-                href="#for-recruiters"
+              <Link
+                href="/sign-up?role=recruiter"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-xl bg-indigo-600 text-white font-semibold text-base shadow-lg shadow-indigo-600/25 hover:bg-indigo-700 hover:shadow-indigo-600/35 hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
               >
                 <Building2 className="w-5 h-5" />
                 <span>I am a Recruiter</span>
                 <ArrowRight className="w-4 h-4" />
-              </a>
+              </Link>
 
-              <a
-                href="#for-candidates"
+              <Link
+                href="/sign-up?role=candidate"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-xl bg-white text-slate-800 font-semibold text-base border border-slate-300 shadow-sm hover:bg-slate-50 hover:border-slate-400 hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2"
               >
                 <Search className="w-5 h-5 text-indigo-600" />
                 <span>I am a Candidate</span>
-              </a>
+              </Link>
             </div>
 
             <div className="mt-16 pt-8 border-t border-slate-200/80 max-w-3xl mx-auto grid grid-cols-2 sm:grid-cols-3 gap-6 text-center">
@@ -294,22 +254,21 @@ export default function Home() {
               Ready to modernize hiring?
             </h2>
             <p className="mt-4 text-indigo-200 text-base sm:text-lg max-w-xl mx-auto">
-              Recruiter and candidate accounts are coming next. Start from the
-              role that matches how you use TalentFlow.
+              Create a recruiter or candidate account with Clerk to get started.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <a
-                href="#for-recruiters"
+              <Link
+                href="/sign-up?role=recruiter"
                 className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-white text-indigo-900 font-semibold hover:bg-slate-100 transition-colors shadow-md"
               >
                 I am a Recruiter
-              </a>
-              <a
-                href="#for-candidates"
+              </Link>
+              <Link
+                href="/sign-up?role=candidate"
                 className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-indigo-700 text-white font-semibold hover:bg-indigo-600 border border-indigo-500 transition-colors"
               >
                 I am a Candidate
-              </a>
+              </Link>
             </div>
           </div>
         </section>

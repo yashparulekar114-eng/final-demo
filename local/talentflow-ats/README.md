@@ -1,6 +1,6 @@
 # TalentFlow ATS (local)
 
-All landing-page source for this project lives in this folder. Run it on your computer — not on the cloud VM.
+Standalone copy of the Next.js landing page and Clerk auth. Run it on your computer — not on the cloud VM.
 
 ## Stack
 
@@ -9,13 +9,19 @@ All landing-page source for this project lives in this folder. Run it on your co
 - TypeScript
 - Tailwind CSS
 - lucide-react
+- Clerk (`@clerk/nextjs`)
 
 ## Files
 
 - `app/page.tsx` — home / landing page
-- `app/layout.tsx` — root layout and metadata
+- `app/layout.tsx` — root layout, metadata, ClerkProvider
+- `app/sign-in` / `app/sign-up` — Clerk auth routes
 - `app/globals.css` — Tailwind styles
 - `public/` — static assets
+
+## Auth
+
+Copy `.env.example` to `.env.local` and add your Clerk keys. Never commit `.env.local`.
 
 ## Run locally
 

@@ -2,9 +2,27 @@
 
 Applicant tracking system starter (Next.js App Router). Recruiters post jobs and review resumes; candidates search roles and upload resumes.
 
-## Local code
+## Auth (Clerk)
 
-The full app source is in **`local/talentflow-ats`**. Copy that folder to your computer, or clone this repo and run from there:
+Copy `.env.example` to `.env.local` and add your Clerk keys:
+
+```
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+CLERK_SECRET_KEY=sk_test_...
+```
+
+Never commit `.env.local`.
+
+## Run locally
+
+From the repo root:
+
+```bash
+npm install
+npm run dev
+```
+
+Or from the standalone copy in **`local/talentflow-ats`**:
 
 ```bash
 cd local/talentflow-ats
@@ -12,6 +30,8 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) on **your** machine.
+Open [http://localhost:3000](http://localhost:3000) on the same computer.
 
-The landing page is `local/talentflow-ats/app/page.tsx`.
+- Sign in: `/sign-in`
+- Sign up as recruiter: `/sign-up?role=recruiter`
+- Sign up as candidate: `/sign-up?role=candidate`
