@@ -21,7 +21,10 @@ export default async function SignUpPage({
           {normalized === "candidate" ? "Candidate" : "Recruiter"}
         </p>
         <h1 className="mt-2 text-2xl font-semibold tracking-tight mb-8">Create an account</h1>
-        <SignUp unsafeMetadata={{ role: normalized }} />
+        <SignUp
+          unsafeMetadata={{ role: normalized }}
+          forceRedirectUrl="/dashboard"
+        />
       </div>
     </div>
   );

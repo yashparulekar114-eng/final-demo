@@ -4,6 +4,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { isRecruiter } from "@/lib/roles";
 
 export type CreateJobState = {
   error?: string;
@@ -18,6 +19,10 @@ export async function createJob(
   const user = await currentUser();
   if (!user) {
     return { error: "You must be signed in to post a job." };
+  }
+
+  if (!isRecruiter(user)) {
+    return { error: "Only recruiters can post jobs." };
   }
 
   const title = String(formData.get("title") ?? "").trim();

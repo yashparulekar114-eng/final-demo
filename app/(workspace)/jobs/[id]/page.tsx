@@ -4,6 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { currentUser } from "@clerk/nextjs/server";
 import { supabase } from "@/lib/supabase";
 import { jobById } from "@/lib/ats-data";
+import { isRecruiter } from "@/lib/roles";
 import ApplyButton from "./ApplyButton";
 import { StatusBadge } from "../../../components/ui";
 
@@ -55,6 +56,8 @@ export default async function JobDetailPage({
   const canApplyLive = Boolean(live);
 
   const user = await currentUser();
+  const recruiter = Boolean(user) && isRecruiter(user);
+  const showApplyForm = canApplyLive && !recruiter;
   let alreadyApplied = false;
   let hasResume = false;
   if (user && live) {
@@ -120,27 +123,43 @@ export default async function JobDetailPage({
         id="apply"
         className="rounded-xl border border-line bg-surface p-6 sm:p-8 scroll-mt-24 space-y-4"
       >
-        <h2 className="text-lg font-semibold tracking-tight">Apply Now</h2>
-        <p className="text-sm text-muted">
-          Attach a PDF resume. Files are stored uniquely in the <code>resumes</code> bucket.
-        </p>
-        {canApplyLive ? (
-          <ApplyButton
-            jobId={jobId}
-            isSignedIn={Boolean(user)}
-            alreadyApplied={alreadyApplied}
-            hasResume={hasResume}
-          />
-        ) : (
-          <div className="space-y-3">
+        {recruiter ? (
+          <>
+            <h2 className="text-lg font-semibold tracking-tight">Hiring</h2>
             <p className="text-sm text-muted">
-              This is a sample listing. Apply Now is available on posted jobs from
-              the board.
+              Recruiters review applicants from Applications. Apply Now is only
+              available to candidates.
             </p>
-            <Link href="/jobs" className="btn-primary">
-              Browse jobs to apply
+            <Link href="/applications" className="btn-secondary">
+              View applications
             </Link>
-          </div>
+          </>
+        ) : (
+          <>
+            <h2 className="text-lg font-semibold tracking-tight">Apply Now</h2>
+            <p className="text-sm text-muted">
+              Attach a PDF resume. Files are stored uniquely in the{" "}
+              <code>resumes</code> bucket.
+            </p>
+            {showApplyForm ? (
+              <ApplyButton
+                jobId={jobId}
+                isSignedIn={Boolean(user)}
+                alreadyApplied={alreadyApplied}
+                hasResume={hasResume}
+              />
+            ) : (
+              <div className="space-y-3">
+                <p className="text-sm text-muted">
+                  This is a sample listing. Apply Now is available on posted jobs
+                  from the board.
+                </p>
+                <Link href="/jobs" className="btn-primary">
+                  Browse jobs to apply
+                </Link>
+              </div>
+            )}
+          </>
         )}
       </section>
     </div>

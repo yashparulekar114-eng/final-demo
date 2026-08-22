@@ -30,10 +30,12 @@ export default function DashboardOverview({
   name,
   liveJobs,
   liveApplicants,
+  isCandidate,
 }: {
   name: string;
   liveJobs: number;
   liveApplicants: number;
+  isCandidate: boolean;
 }) {
   const values = {
     jobs: liveJobs || STATS[0].fallback,
@@ -53,12 +55,20 @@ export default function DashboardOverview({
             {greeting()}, {name.split(" ")[0]}
           </h1>
           <p className="mt-1 text-sm text-muted">
-            Recruiters track the pipeline here. Candidates can apply to open roles.
+            {isCandidate
+              ? "Track your applications and apply to open roles."
+              : "Track your hiring pipeline and post new roles."}
           </p>
         </div>
-        <Link href="/jobs" className="btn-primary">
-          Apply to a job
-        </Link>
+        {isCandidate ? (
+          <Link href="/jobs" className="btn-primary">
+            Apply to a job
+          </Link>
+        ) : (
+          <Link href="/jobs/new" className="btn-primary">
+            Create Job
+          </Link>
+        )}
       </div>
 
       <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3">

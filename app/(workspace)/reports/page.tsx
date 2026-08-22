@@ -1,9 +1,11 @@
 import { auth } from "@clerk/nextjs/server";
+import { requireRecruiter } from "@/lib/roles";
 import { applicationTrend, funnelCounts, mockJobs, PIPELINE_STAGES } from "@/lib/ats-data";
 import { MiniChart } from "../../components/ui";
 
 export default async function ReportsPage() {
   await auth.protect();
+  await requireRecruiter("/jobs");
   const max = funnelCounts.Applied;
 
   return (

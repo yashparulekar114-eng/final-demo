@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { supabase } from "@/lib/supabase";
 import { uploadResumeToBucket } from "@/lib/uploadResume";
 import { sendApplicationReceivedEmail } from "@/lib/resend";
+import { isRecruiter } from "@/lib/roles";
 
 export type ApplyFailedStep = "upload" | "database" | "email" | "auth";
 
@@ -63,6 +64,13 @@ export async function applyToJob(
       return {
         failedStep: "auth",
         error: "You must be signed in to apply.",
+      };
+    }
+
+    if (isRecruiter(user)) {
+      return {
+        failedStep: "auth",
+        error: "Recruiters cannot apply to jobs. Use a candidate account.",
       };
     }
 

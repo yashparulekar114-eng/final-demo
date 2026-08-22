@@ -2,6 +2,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { loadDashboardData } from "../dashboard/load";
 import ApplicationsBoard from "./ApplicationsBoard";
+import { isCandidate } from "@/lib/roles";
 
 export default async function ApplicationsPage() {
   await auth.protect();
@@ -14,6 +15,7 @@ export default async function ApplicationsPage() {
     <ApplicationsBoard
       recruiterApplications={live.recruiterApplications}
       candidateApplications={live.candidateApplications}
+      isCandidate={isCandidate(user)}
     />
   );
 }

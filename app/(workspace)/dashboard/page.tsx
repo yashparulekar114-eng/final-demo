@@ -2,6 +2,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import DashboardOverview from "../../components/DashboardOverview";
 import { loadDashboardData } from "./load";
+import { isCandidate } from "@/lib/roles";
 
 export default async function DashboardPage() {
   await auth.protect();
@@ -32,6 +33,7 @@ export default async function DashboardPage() {
       name={fullName}
       liveJobs={openJobCount}
       liveApplicants={applicantCount}
+      isCandidate={isCandidate(user)}
     />
   );
 }

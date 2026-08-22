@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
 import { ArrowLeft, Linkedin, Mail, Phone, FileText } from "lucide-react";
 import { candidateById } from "@/lib/ats-data";
+import { requireRecruiter } from "@/lib/roles";
 import { Avatar, MatchBar, StatusBadge } from "../../../components/ui";
 import NotesPanel from "./NotesPanel";
 
@@ -12,6 +13,7 @@ export default async function CandidateProfilePage({
   params: Promise<{ id: string }>;
 }) {
   await auth.protect();
+  await requireRecruiter("/jobs");
   const { id } = await params;
   const c = candidateById(id);
   if (!c) notFound();

@@ -1,5 +1,6 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import AppShell from "../components/AppShell";
+import { getAppRole, syncPublicRole } from "@/lib/roles";
 
 export default async function WorkspaceLayout({
   children,
@@ -12,6 +13,8 @@ export default async function WorkspaceLayout({
   }
 
   const user = await currentUser();
+  await syncPublicRole();
+  const role = getAppRole(user);
   const name =
     [user?.firstName, user?.lastName].filter(Boolean).join(" ") ||
     user?.username ||
@@ -19,7 +22,12 @@ export default async function WorkspaceLayout({
   const email = user?.primaryEmailAddress?.emailAddress ?? "";
 
   return (
-    <AppShell userName={name} userEmail={email}>
+    <AppShell
+      userName={name}
+      userEmail={email}
+      isRecruiter={role === "recruiter"}
+      isCandidate={role === "candidate"}
+    >
       {children}
     </AppShell>
   );

@@ -1,7 +1,7 @@
-import { auth } from "@clerk/nextjs/server";
-import { loadLiveJobs } from "@/lib/loadLiveJobs";
+import { auth, currentUser } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
+import { isRecruiter } from "@/lib/roles";
 import CandidatesBoard from "./CandidatesBoard";
-import OpenRolesApply from "../../components/OpenRolesApply";
 
 export default async function CandidatesPage({
   searchParams,
@@ -9,13 +9,11 @@ export default async function CandidatesPage({
   searchParams: Promise<{ q?: string }>;
 }) {
   await auth.protect();
-  const { q } = await searchParams;
-  const liveJobs = await loadLiveJobs();
+  const user = await currentUser();
+  if (!user) redirect("/sign-in");
+  if (!isRecruiter(user)) redirect("/jobs");
 
-  return (
-    <div className="max-w-7xl space-y-6">
-      <OpenRolesApply jobs={liveJobs} />
-      <CandidatesBoard initialQ={q ?? ""} />
-    </div>
-  );
+  const { q } = await searchParams;
+
+  return <CandidatesBoard initialQ={q ?? ""} />;
 }

@@ -18,9 +18,11 @@ const statusTone: Record<JobStatus, "green" | "slate" | "amber" | "red"> = {
 export default function JobsManager({
   liveJobs,
   signedIn,
+  isRecruiter,
 }: {
   liveJobs: LiveJob[];
   signedIn: boolean;
+  isRecruiter: boolean;
 }) {
   const create = useCreateJob();
   const [q, setQ] = useState("");
@@ -67,10 +69,12 @@ export default function JobsManager({
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Jobs</h1>
           <p className="text-sm text-muted mt-1">
-            Candidates: open a posted role and click Apply. Recruiters can also create jobs.
+            {isRecruiter
+              ? "Post roles and review who applied."
+              : "Browse open roles and apply with a PDF resume."}
           </p>
         </div>
-        {signedIn ? (
+        {isRecruiter ? (
           <div className="flex gap-2">
             <Link href="/jobs/new" className="btn-secondary">
               Post a job
@@ -80,11 +84,11 @@ export default function JobsManager({
               Create Job
             </button>
           </div>
-        ) : (
+        ) : !signedIn ? (
           <Link href="/sign-in?redirect_url=%2Fjobs" className="btn-primary">
             Sign in to apply
           </Link>
-        )}
+        ) : null}
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3">
@@ -156,7 +160,11 @@ export default function JobsManager({
                   </td>
                   <td className="px-4 py-3 text-muted">{j.posted}</td>
                   <td className="px-4 py-3">
-                    {j.canApply ? (
+                    {isRecruiter ? (
+                      <Link href={`/jobs/${j.id}`} className="btn-text text-xs">
+                        View
+                      </Link>
+                    ) : j.canApply ? (
                       <Link href={`/jobs/${j.id}#apply`} className="btn-primary text-xs">
                         Apply
                       </Link>

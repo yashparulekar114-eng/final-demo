@@ -80,9 +80,11 @@ function ApplicationTable({
 export default function ApplicationsBoard({
   recruiterApplications,
   candidateApplications,
+  isCandidate,
 }: {
   recruiterApplications: DashboardApplication[];
   candidateApplications: DashboardApplication[];
+  isCandidate: boolean;
 }) {
   return (
     <div className="max-w-6xl space-y-10">
@@ -93,28 +95,36 @@ export default function ApplicationsBoard({
             Live records from Supabase after a candidate clicks Apply Now.
           </p>
         </div>
-        <Link href="/jobs" className="btn-primary">
-          Apply to a job
-        </Link>
+        {isCandidate ? (
+          <Link href="/jobs" className="btn-primary">
+            Apply to a job
+          </Link>
+        ) : (
+          <Link href="/jobs/new" className="btn-secondary">
+            Post a job
+          </Link>
+        )}
       </div>
 
-      <section className="space-y-3">
-        <h2 className="text-sm font-semibold">Your applications</h2>
-        <ApplicationTable
-          rows={candidateApplications}
-          emptyTitle="You have not applied yet"
-          emptyBody="Open a posted job and click Apply Now."
-        />
-      </section>
-
-      <section className="space-y-3">
-        <h2 className="text-sm font-semibold">Applicants on your jobs</h2>
-        <ApplicationTable
-          rows={recruiterApplications}
-          emptyTitle="No applicants yet"
-          emptyBody="When someone applies to a job you posted, they appear here."
-        />
-      </section>
+      {isCandidate ? (
+        <section className="space-y-3">
+          <h2 className="text-sm font-semibold">Your applications</h2>
+          <ApplicationTable
+            rows={candidateApplications}
+            emptyTitle="You have not applied yet"
+            emptyBody="Open a posted job and click Apply Now."
+          />
+        </section>
+      ) : (
+        <section className="space-y-3">
+          <h2 className="text-sm font-semibold">Applicants on your jobs</h2>
+          <ApplicationTable
+            rows={recruiterApplications}
+            emptyTitle="No applicants yet"
+            emptyBody="When someone applies to a job you posted, they appear here."
+          />
+        </section>
+      )}
     </div>
   );
 }

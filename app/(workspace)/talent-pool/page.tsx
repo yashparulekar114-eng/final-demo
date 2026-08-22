@@ -1,10 +1,12 @@
 import { auth } from "@clerk/nextjs/server";
+import { requireRecruiter } from "@/lib/roles";
 import Link from "next/link";
 import { mockCandidates } from "@/lib/ats-data";
 import { Avatar, StatusBadge } from "../../components/ui";
 
 export default async function TalentPoolPage() {
   await auth.protect();
+  await requireRecruiter("/jobs");
   const pool = mockCandidates.filter((c) => c.stage === "Hired" || c.matchScore >= 80);
 
   return (

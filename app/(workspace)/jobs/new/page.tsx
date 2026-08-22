@@ -2,9 +2,11 @@ import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 import { ArrowLeft } from "lucide-react";
 import JobForm from "./JobForm";
+import { requireRecruiter } from "@/lib/roles";
 
 export default async function NewJobPage() {
   await auth.protect();
+  await requireRecruiter("/jobs");
 
   return (
     <div className="max-w-xl">

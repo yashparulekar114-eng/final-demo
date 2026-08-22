@@ -23,7 +23,7 @@ import { UserButton } from "@clerk/nextjs";
 import { useCreateJob } from "./CreateJobModal";
 import { Avatar, cn } from "./ui";
 
-const NAV = [
+const RECRUITER_NAV = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/jobs", label: "Jobs", icon: Briefcase },
   { href: "/candidates", label: "Candidates", icon: Users },
@@ -33,25 +33,46 @@ const NAV = [
   { href: "/reports", label: "Reports", icon: BarChart3 },
 ];
 
-const MOBILE = [
+const CANDIDATE_NAV = [
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/jobs", label: "Jobs", icon: Briefcase },
+  { href: "/applications", label: "Applications", icon: FileText },
+  { href: "/interviews", label: "Interviews", icon: Calendar },
+];
+
+const RECRUITER_MOBILE = [
   { href: "/dashboard", label: "Home", icon: LayoutDashboard },
-  { href: "/jobs", label: "Apply", icon: Briefcase },
+  { href: "/jobs", label: "Jobs", icon: Briefcase },
   { href: "/candidates", label: "People", icon: Users },
   { href: "/interviews", label: "Talks", icon: Calendar },
   { href: "/reports", label: "Stats", icon: BarChart3 },
+];
+
+const CANDIDATE_MOBILE = [
+  { href: "/dashboard", label: "Home", icon: LayoutDashboard },
+  { href: "/jobs", label: "Jobs", icon: Briefcase },
+  { href: "/applications", label: "Apps", icon: FileText },
+  { href: "/interviews", label: "Talks", icon: Calendar },
+  { href: "/help", label: "Help", icon: HelpCircle },
 ];
 
 export default function AppShell({
   children,
   userName,
   userEmail,
+  isRecruiter,
+  isCandidate,
 }: {
   children: React.ReactNode;
   userName: string;
   userEmail: string;
+  isRecruiter: boolean;
+  isCandidate: boolean;
 }) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const nav = isRecruiter ? RECRUITER_NAV : CANDIDATE_NAV;
+  const mobile = isRecruiter ? RECRUITER_MOBILE : CANDIDATE_MOBILE;
 
   return (
     <div className="min-h-screen bg-canvas flex">
@@ -75,7 +96,7 @@ export default function AppShell({
           </button>
         </div>
         <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
-          {NAV.map((item) => {
+          {nav.map((item) => {
             const active =
               pathname === item.href || pathname.startsWith(`${item.href}/`);
             const Icon = item.icon;
@@ -116,7 +137,10 @@ export default function AppShell({
             <Avatar name={userName} size="sm" />
             <div className="min-w-0 flex-1">
               <p className="text-sm font-medium truncate">{userName}</p>
-              <p className="text-xs text-muted truncate">{userEmail}</p>
+              <p className="text-xs text-muted truncate">
+                {isRecruiter ? "Recruiter" : "Candidate"}
+                {userEmail ? ` · ${userEmail}` : ""}
+              </p>
             </div>
             <UserButton />
           </div>
@@ -133,12 +157,16 @@ export default function AppShell({
       ) : null}
 
       <div className="flex-1 flex flex-col min-w-0 pb-16 lg:pb-0">
-        <TopBar onMenu={() => setSidebarOpen(true)} />
+        <TopBar
+          onMenu={() => setSidebarOpen(true)}
+          isRecruiter={isRecruiter}
+          isCandidate={isCandidate}
+        />
         <main className="flex-1 px-4 sm:px-6 lg:px-8 py-6 lg:py-8">{children}</main>
       </div>
 
       <nav className="lg:hidden fixed bottom-0 inset-x-0 z-30 border-t border-line bg-surface grid grid-cols-5">
-        {MOBILE.map((item) => {
+        {mobile.map((item) => {
           const Icon = item.icon;
           const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
           return (
@@ -162,8 +190,12 @@ export default function AppShell({
 
 function TopBar({
   onMenu,
+  isRecruiter,
+  isCandidate,
 }: {
   onMenu: () => void;
+  isRecruiter: boolean;
+  isCandidate: boolean;
 }) {
   const createJob = useCreateJob();
   const router = useRouter();
@@ -184,7 +216,11 @@ function TopBar({
         className="flex-1 max-w-xl"
         onSubmit={(e) => {
           e.preventDefault();
-          router.push(`/candidates?q=${encodeURIComponent(q)}`);
+          router.push(
+            isRecruiter
+              ? `/candidates?q=${encodeURIComponent(q)}`
+              : `/jobs`,
+          );
         }}
       >
         <label className="relative block">
@@ -192,7 +228,7 @@ function TopBar({
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Search candidates, jobs…"
+            placeholder={isRecruiter ? "Search candidates, jobs…" : "Search jobs…"}
             className="w-full h-9 pl-9 pr-3 rounded-xl border border-line bg-surface text-sm outline-none focus:border-accent"
           />
         </label>
@@ -214,13 +250,17 @@ function TopBar({
           </div>
         ) : null}
       </div>
-      <Link href="/jobs" className="btn-secondary hidden sm:inline-flex">
-        Apply to a job
-      </Link>
-      <button type="button" className="btn-primary hidden sm:inline-flex" onClick={createJob.open}>
-        <Plus className="h-4 w-4" />
-        Create Job
-      </button>
+      {isCandidate ? (
+        <Link href="/jobs" className="btn-secondary hidden sm:inline-flex">
+          Apply to a job
+        </Link>
+      ) : null}
+      {isRecruiter ? (
+        <button type="button" className="btn-primary hidden sm:inline-flex" onClick={createJob.open}>
+          <Plus className="h-4 w-4" />
+          Create Job
+        </button>
+      ) : null}
       <div className="hidden sm:block">
         <UserButton />
       </div>
