@@ -20,20 +20,17 @@ export async function uploadResumeToBucket(
   const path = `${candidateId}/${Date.now()}.pdf`;
   const buffer = Buffer.from(await file.arrayBuffer());
 
-  const { error } = await supabase.storage.from("resumes").upload(path, buffer, {
+  const { data, error } = await supabase.storage.from("resumes").upload(path, buffer, {
     contentType: "application/pdf",
     upsert: false,
   });
 
   if (error) {
-    if (error.message.toLowerCase().includes("bucket") || error.message.includes("not found")) {
-      throw new Error(
-        'The "resumes" storage bucket is missing. Create it (public) in Supabase Storage, or run the latest database-schema.sql.',
-      );
-    }
-    throw new Error(error.message);
+    throw error;
   }
 
-  const { data } = supabase.storage.from("resumes").getPublicUrl(path);
-  return data.publicUrl;
+  const { data: publicUrl } = supabase.storage.from("resumes").getPublicUrl(
+    data?.path ?? path,
+  );
+  return publicUrl.publicUrl;
 }

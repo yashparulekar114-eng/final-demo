@@ -19,7 +19,10 @@ export default function ApplyButton({
 }) {
   const [state, formAction, pending] = useActionState(applyToJob, initial);
   const [clientError, setClientError] = useState<string | null>(null);
-  const applied = (alreadyApplied && hasResume) || Boolean(state.success);
+  const applied =
+    ((alreadyApplied && hasResume) || Boolean(state.success)) &&
+    state.failedStep !== "upload";
+  const displayError = clientError || state.error;
 
   if (!isSignedIn) {
     return (
@@ -37,7 +40,9 @@ export default function ApplyButton({
       <div className="space-y-4">
         <p className="text-lg font-light tracking-tight">Application received.</p>
         {state.error ? (
-          <p className="text-sm font-light text-muted leading-relaxed">{state.error}</p>
+          <p className="text-sm font-medium text-amber-700 leading-relaxed" role="alert">
+            {state.error}
+          </p>
         ) : null}
       </div>
     );
@@ -54,7 +59,7 @@ export default function ApplyButton({
         const file = input?.files?.[0];
         if (!file) {
           event.preventDefault();
-          setClientError("Please choose a PDF resume.");
+          setClientError("Resume upload failed: Please choose a PDF resume.");
           return;
         }
         const isPdf =
@@ -62,7 +67,7 @@ export default function ApplyButton({
           file.name.toLowerCase().endsWith(".pdf");
         if (!isPdf) {
           event.preventDefault();
-          setClientError("Only PDF files are allowed.");
+          setClientError("Resume upload failed: Only PDF files are allowed.");
           return;
         }
         setClientError(null);
@@ -89,9 +94,9 @@ export default function ApplyButton({
             ? "Attach resume"
             : "Apply"}
       </button>
-      {clientError || state.error ? (
-        <p className="text-sm font-light text-accent leading-relaxed">
-          {clientError || state.error}
+      {displayError ? (
+        <p className="text-sm font-medium text-rose-600 leading-relaxed" role="alert">
+          {displayError}
         </p>
       ) : null}
     </form>
