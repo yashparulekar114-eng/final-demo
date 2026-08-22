@@ -24,6 +24,24 @@ export default async function JobsPage({
   const { q: rawQuery } = await searchParams;
   const query = sanitizeSearch(rawQuery ?? "");
 
+  if (
+    !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+    !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  ) {
+    return (
+      <JobsShell query={rawQuery ?? ""}>
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-amber-900">
+          <h2 className="font-bold">Supabase is not configured</h2>
+          <p className="mt-2 text-sm">
+            Copy <code className="font-mono">.env.example</code> to{" "}
+            <code className="font-mono">.env.local</code> and add your project
+            URL and anon key, then restart the app.
+          </p>
+        </div>
+      </JobsShell>
+    );
+  }
+
   let request = supabase
     .from("jobs")
     .select("id, title, description, status, created_at")

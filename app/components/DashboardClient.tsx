@@ -12,10 +12,7 @@ import {
   CheckCircle2,
   Building2,
   ArrowRight,
-  LayoutDashboard,
 } from "lucide-react";
-import { UserButton } from "@clerk/nextjs";
-
 type Role = "recruiter" | "candidate";
 
 type DashboardUser = {
@@ -54,27 +51,6 @@ export default function DashboardClient({ user }: { user: DashboardUser }) {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-4">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="h-10 w-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white">
-              <Briefcase className="w-5 h-5" />
-            </div>
-            <span className="text-xl font-bold tracking-tight">
-              Talent<span className="text-indigo-600">Flow</span>
-            </span>
-          </Link>
-
-          <div className="flex items-center gap-3">
-            <span className="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium text-slate-500">
-              <LayoutDashboard className="w-4 h-4" />
-              Dashboard
-            </span>
-            <UserButton />
-          </div>
-        </div>
-      </header>
-
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-10">
           <div>

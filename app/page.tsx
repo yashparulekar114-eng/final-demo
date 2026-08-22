@@ -12,13 +12,9 @@ import {
   FileText,
   CheckCircle2,
 } from "lucide-react";
-import SiteHeader from "./components/SiteHeader";
-
 export default function Home() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col selection:bg-indigo-500 selection:text-white">
-      <SiteHeader />
-
       <main className="flex-grow">
         <section
           id="get-started"
