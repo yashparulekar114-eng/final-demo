@@ -27,12 +27,26 @@ export async function createJob(
     return { error: "Job title and description are required." };
   }
 
-  const { error } = await supabase.from("jobs").insert({
-    title,
-    description,
-    recruiter_id: user.id,
-    status: "Open",
-  });
+  if (
+    !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+    !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  ) {
+    return { error: "Supabase is not configured. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY." };
+  }
+
+  let error;
+  try {
+    ({ error } = await supabase.from("jobs").insert({
+      title,
+      description,
+      recruiter_id: user.id,
+      status: "Open",
+    }));
+  } catch (err) {
+    return {
+      error: err instanceof Error ? err.message : "Could not create the job.",
+    };
+  }
 
   if (error) {
     return {

@@ -32,7 +32,8 @@ export async function scheduleInterview(
   _prev: ScheduleInterviewState,
   formData: FormData,
 ): Promise<ScheduleInterviewState> {
-  await auth.protect();
+  try {
+    await auth.protect();
 
   const user = await currentUser();
   if (!user) {
@@ -139,4 +140,9 @@ export async function scheduleInterview(
   revalidatePath("/dashboard");
   revalidatePath(`/jobs/${application.job_id}`);
   return { success: true };
+  } catch (err) {
+    return {
+      error: err instanceof Error ? err.message : "Could not schedule the interview.",
+    };
+  }
 }

@@ -22,7 +22,13 @@ export type LiveJob = {
   created_at: string;
 };
 
-export default function JobsManager({ liveJobs }: { liveJobs: LiveJob[] }) {
+export default function JobsManager({
+  liveJobs,
+  signedIn,
+}: {
+  liveJobs: LiveJob[];
+  signedIn: boolean;
+}) {
   const create = useCreateJob();
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<string>("All");
@@ -66,15 +72,21 @@ export default function JobsManager({ liveJobs }: { liveJobs: LiveJob[] }) {
           <h1 className="text-2xl font-semibold tracking-tight">Jobs</h1>
           <p className="text-sm text-muted mt-1">Open roles, drafts, and closed reqs.</p>
         </div>
-        <div className="flex gap-2">
-          <Link href="/jobs/new" className="btn-secondary">
-            Full form
+        {signedIn ? (
+          <div className="flex gap-2">
+            <Link href="/jobs/new" className="btn-secondary">
+              Full form
+            </Link>
+            <button type="button" className="btn-primary" onClick={create.open}>
+              <Plus className="h-4 w-4" />
+              Create Job
+            </button>
+          </div>
+        ) : (
+          <Link href="/sign-in?redirect_url=%2Fjobs" className="btn-primary">
+            Sign in to post
           </Link>
-          <button type="button" className="btn-primary" onClick={create.open}>
-            <Plus className="h-4 w-4" />
-            Create Job
-          </button>
-        </div>
+        )}
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3">

@@ -16,13 +16,22 @@ export default async function DashboardPage() {
     user.username ||
     "there";
 
-  const live = await loadDashboardData(user.id);
+  let openJobCount = 0;
+  let applicantCount = 0;
+  try {
+    const live = await loadDashboardData(user.id);
+    openJobCount = live.openJobCount;
+    applicantCount = live.applicantCount;
+  } catch {
+    openJobCount = 0;
+    applicantCount = 0;
+  }
 
   return (
     <DashboardOverview
       name={fullName}
-      liveJobs={live.openJobCount}
-      liveApplicants={live.applicantCount}
+      liveJobs={openJobCount}
+      liveApplicants={applicantCount}
     />
   );
 }

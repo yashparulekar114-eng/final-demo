@@ -21,19 +21,27 @@ export default async function JobDetailPage({
     description: string;
     status: string;
   } | null = null;
+  let loadError: string | null = null;
 
   if (!mock && process.env.NEXT_PUBLIC_SUPABASE_URL) {
-    const { data, error } = await supabase
-      .from("jobs")
-      .select("id, title, description, status")
-      .eq("id", id)
-      .maybeSingle();
-    if (error) {
-      return (
-        <p className="text-sm text-muted">Could not load this job. {error.message}</p>
-      );
+    try {
+      const { data, error } = await supabase
+        .from("jobs")
+        .select("id, title, description, status")
+        .eq("id", id)
+        .maybeSingle();
+      if (error) {
+        loadError = error.message;
+      } else {
+        live = data;
+      }
+    } catch (err) {
+      loadError = err instanceof Error ? err.message : "Could not load this job.";
     }
-    live = data;
+  }
+
+  if (loadError) {
+    return <p className="text-sm text-muted">Could not load this job. {loadError}</p>;
   }
 
   if (!mock && !live) notFound();
@@ -46,23 +54,28 @@ export default async function JobDetailPage({
   let alreadyApplied = false;
   let hasResume = false;
   if (user && live) {
-    const withResume = await supabase
-      .from("applications")
-      .select("id, resume_url")
-      .eq("job_id", live.id)
-      .eq("candidate_id", user.id)
-      .maybeSingle();
-    if (withResume.error?.message.includes("resume_url")) {
-      const fallback = await supabase
+    try {
+      const withResume = await supabase
         .from("applications")
-        .select("id")
+        .select("id, resume_url")
         .eq("job_id", live.id)
         .eq("candidate_id", user.id)
         .maybeSingle();
-      alreadyApplied = Boolean(fallback.data);
-    } else {
-      alreadyApplied = Boolean(withResume.data);
-      hasResume = Boolean(withResume.data?.resume_url);
+      if (withResume.error?.message.includes("resume_url")) {
+        const fallback = await supabase
+          .from("applications")
+          .select("id")
+          .eq("job_id", live.id)
+          .eq("candidate_id", user.id)
+          .maybeSingle();
+        alreadyApplied = Boolean(fallback.data);
+      } else if (!withResume.error) {
+        alreadyApplied = Boolean(withResume.data);
+        hasResume = Boolean(withResume.data?.resume_url);
+      }
+    } catch {
+      alreadyApplied = false;
+      hasResume = false;
     }
   }
 

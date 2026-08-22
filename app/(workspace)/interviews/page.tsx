@@ -4,11 +4,19 @@ import { mockInterviews } from "@/lib/ats-data";
 import { StatusBadge } from "../../components/ui";
 import LiveInterviews from "./LiveInterviews";
 import { loadDashboardData } from "../dashboard/load";
+import type { DashboardData } from "../dashboard/types";
 
 export default async function InterviewsPage() {
   await auth.protect();
   const user = await currentUser();
-  const live = user ? await loadDashboardData(user.id) : null;
+  let live: DashboardData | null = null;
+  if (user) {
+    try {
+      live = await loadDashboardData(user.id);
+    } catch {
+      live = null;
+    }
+  }
 
   const days = Array.from({ length: 14 }, (_, i) => {
     const d = new Date();
