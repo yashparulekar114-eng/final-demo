@@ -18,18 +18,21 @@ export default function SiteHeader() {
         </Link>
 
         <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
-          <a href="#features" className="hover:text-indigo-600 transition-colors">
+          <Link href="/jobs" className="hover:text-indigo-600 transition-colors">
+            Jobs
+          </Link>
+          <Link href="/#features" className="hover:text-indigo-600 transition-colors">
             Features
-          </a>
-          <a href="#how-it-works" className="hover:text-indigo-600 transition-colors">
+          </Link>
+          <Link href="/#how-it-works" className="hover:text-indigo-600 transition-colors">
             How It Works
-          </a>
-          <a href="#for-recruiters" className="hover:text-indigo-600 transition-colors">
+          </Link>
+          <Link href="/#for-recruiters" className="hover:text-indigo-600 transition-colors">
             For Recruiters
-          </a>
-          <a href="#for-candidates" className="hover:text-indigo-600 transition-colors">
+          </Link>
+          <Link href="/#for-candidates" className="hover:text-indigo-600 transition-colors">
             For Candidates
-          </a>
+          </Link>
         </nav>
 
         <div className="flex items-center gap-3">
@@ -48,6 +51,12 @@ export default function SiteHeader() {
             </Link>
           </Show>
           <Show when="signed-in">
+            <Link
+              href="/dashboard"
+              className="text-sm font-semibold text-slate-700 hover:text-indigo-600 px-3 py-2 rounded-lg transition-colors"
+            >
+              Dashboard
+            </Link>
             <UserButton />
           </Show>
         </div>
