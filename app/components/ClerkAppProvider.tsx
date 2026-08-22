@@ -22,21 +22,21 @@ export default function ClerkAppProvider({
       ]}
       appearance={{
         variables: {
-          colorPrimary: "#7a1f3d",
+          colorPrimary: "#4f46e5",
           colorBackground: "#ffffff",
-          colorNeutral: "#1c1917",
-          borderRadius: "0.125rem",
+          colorNeutral: "#0f172a",
+          borderRadius: "0.75rem",
           fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif",
         },
         elements: {
-          card: "shadow-none border border-[#e6e2db] rounded-sm bg-white",
-          headerTitle: "font-medium tracking-tight text-[#1c1917]",
-          headerSubtitle: "text-[#6f6a64] font-normal",
+          card: "shadow-none border border-[#e2e8f0] rounded-xl bg-white",
+          headerTitle: "font-semibold tracking-tight text-[#0f172a]",
+          headerSubtitle: "text-[#64748b] font-normal",
           formButtonPrimary:
-            "bg-[#7a1f3d] hover:bg-[#641832] shadow-none rounded-sm font-medium",
-          footerActionLink: "text-[#7a1f3d] hover:text-[#641832]",
+            "bg-[#4f46e5] hover:bg-[#4338ca] shadow-none rounded-xl font-medium",
+          footerActionLink: "text-[#4f46e5] hover:text-[#4338ca]",
           socialButtonsBlockButton:
-            "border border-[#e6e2db] shadow-none rounded-sm",
+            "border border-[#e2e8f0] shadow-none rounded-xl",
         },
       }}
     >

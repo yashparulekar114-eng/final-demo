@@ -37,7 +37,7 @@ export default function SiteHeader() {
             >
               Sign in
             </Link>
-            <Link href="/sign-up" className="btn-primary !px-5 !py-2.5 text-sm">
+            <Link href="/sign-up" className="btn-primary hidden sm:inline-flex">
               Get started
             </Link>
           </Show>
