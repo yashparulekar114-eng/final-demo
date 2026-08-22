@@ -48,6 +48,12 @@ export default function SiteHeader() {
             </Link>
           </Show>
           <Show when="signed-in">
+            <Link
+              href="/dashboard"
+              className="text-sm font-semibold text-slate-700 hover:text-indigo-600 px-3 py-2 rounded-lg transition-colors"
+            >
+              Dashboard
+            </Link>
             <UserButton />
           </Show>
         </div>

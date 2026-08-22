@@ -35,3 +35,4 @@ Open [http://localhost:3000](http://localhost:3000) on the same computer.
 - Sign in: `/sign-in`
 - Sign up as recruiter: `/sign-up?role=recruiter`
 - Sign up as candidate: `/sign-up?role=candidate`
+- Dashboard (signed in): `/dashboard``
