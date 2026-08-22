@@ -2,17 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import {
-  Briefcase,
-  Users,
-  Plus,
-  Search,
-  FileText,
-  Clock,
-  CheckCircle2,
-  Building2,
-  ArrowRight,
-} from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
+import type { DashboardApplication } from "../dashboard/types";
+import ScheduleInterviewForm from "../dashboard/ScheduleInterviewForm";
+
 type Role = "recruiter" | "candidate";
 
 type DashboardUser = {
@@ -22,178 +15,252 @@ type DashboardUser = {
   imageUrl: string;
 };
 
-const mockApplications = [
-  {
-    id: "1",
-    title: "Frontend Engineer",
-    company: "Northwind Labs",
-    status: "Applied" as const,
-    updated: "2 days ago",
-  },
-  {
-    id: "2",
-    title: "Product Designer",
-    company: "Harbor & Co.",
-    status: "Interviewing" as const,
-    updated: "Yesterday",
-  },
-  {
-    id: "3",
-    title: "Full-Stack Developer",
-    company: "Brightline",
-    status: "Applied" as const,
-    updated: "5 days ago",
-  },
-];
+function formatInterviewTime(iso: string) {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return iso;
+  return date.toLocaleString(undefined, {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
 
-export default function DashboardClient({ user }: { user: DashboardUser }) {
+export default function DashboardClient({
+  user,
+  recruiterApplications,
+  candidateApplications,
+  openJobCount,
+  applicantCount,
+  interviewsTableMissing,
+}: {
+  user: DashboardUser;
+  recruiterApplications: DashboardApplication[];
+  candidateApplications: DashboardApplication[];
+  openJobCount: number;
+  applicantCount: number;
+  interviewsTableMissing: boolean;
+}) {
   const [role, setRole] = useState<Role>("recruiter");
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-10">
-          <div>
-            <p className="text-sm font-semibold text-indigo-600">Welcome back</p>
-            <h1 className="mt-1 text-3xl sm:text-4xl font-bold tracking-tight text-slate-900">
+    <div>
+      <main className="page-shell py-16 sm:py-24">
+        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-10">
+          <div className="max-w-xl">
+            <p className="eyebrow">Welcome</p>
+            <h1 className="mt-4 text-4xl sm:text-5xl font-light tracking-tight text-ink">
               {user.name}
             </h1>
-            <p className="mt-2 text-sm text-slate-500">{user.email}</p>
+            <p className="mt-4 text-base font-light text-muted">{user.email}</p>
           </div>
 
-          <div className="inline-flex rounded-xl border border-slate-200 bg-white p-1 shadow-sm self-start">
+          <div className="flex items-center gap-8 self-start">
             <button
               type="button"
               onClick={() => setRole("recruiter")}
-              className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+              className={`text-sm tracking-wide pb-1 border-b transition-colors ${
                 role === "recruiter"
-                  ? "bg-indigo-600 text-white"
-                  : "text-slate-600 hover:text-slate-900"
+                  ? "border-ink text-ink font-medium"
+                  : "border-transparent text-muted hover:text-ink"
               }`}
             >
-              <Building2 className="w-4 h-4" />
               Recruiter
             </button>
             <button
               type="button"
               onClick={() => setRole("candidate")}
-              className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+              className={`text-sm tracking-wide pb-1 border-b transition-colors ${
                 role === "candidate"
-                  ? "bg-indigo-600 text-white"
-                  : "text-slate-600 hover:text-slate-900"
+                  ? "border-ink text-ink font-medium"
+                  : "border-transparent text-muted hover:text-ink"
               }`}
             >
-              <Search className="w-4 h-4" />
               Candidate
             </button>
           </div>
         </div>
 
-        {role === "recruiter" ? <RecruiterView /> : <CandidateView />}
+        {interviewsTableMissing ? (
+          <p className="mt-12 max-w-xl text-sm font-light leading-relaxed text-muted">
+            Interview scheduling needs the interviews table. Run the latest
+            database-schema.sql in the Supabase SQL Editor, then refresh.
+          </p>
+        ) : null}
+
+        <div className="mt-16 sm:mt-20">
+          {role === "recruiter" ? (
+            <RecruiterView
+              applications={recruiterApplications}
+              openJobCount={openJobCount}
+              applicantCount={applicantCount}
+            />
+          ) : (
+            <CandidateView applications={candidateApplications} />
+          )}
+        </div>
       </main>
     </div>
   );
 }
 
-function RecruiterView() {
+function RecruiterView({
+  applications,
+  openJobCount,
+  applicantCount,
+}: {
+  applications: DashboardApplication[];
+  openJobCount: number;
+  applicantCount: number;
+}) {
   return (
-    <div className="space-y-8">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <article className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-          <div className="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center mb-4">
-            <Briefcase className="w-6 h-6" />
-          </div>
-          <p className="text-sm font-medium text-slate-500">Active Jobs</p>
-          <p className="mt-1 text-4xl font-bold tracking-tight text-slate-900">12</p>
-          <p className="mt-2 text-sm text-slate-500">Open roles currently accepting applicants</p>
+    <div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-line border border-line">
+        <article className="bg-surface p-10 sm:p-12">
+          <p className="eyebrow">Active jobs</p>
+          <p className="mt-6 text-5xl font-light tracking-tight">{openJobCount}</p>
+          <p className="mt-4 text-sm font-light text-muted leading-relaxed">
+            Open roles currently accepting applicants
+          </p>
         </article>
-
-        <article className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-          <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center mb-4">
-            <Users className="w-6 h-6" />
-          </div>
-          <p className="text-sm font-medium text-slate-500">Total Candidates</p>
-          <p className="mt-1 text-4xl font-bold tracking-tight text-slate-900">84</p>
-          <p className="mt-2 text-sm text-slate-500">Applicants across all open pipelines</p>
+        <article className="bg-surface p-10 sm:p-12">
+          <p className="eyebrow">Applications</p>
+          <p className="mt-6 text-5xl font-light tracking-tight">{applicantCount}</p>
+          <p className="mt-4 text-sm font-light text-muted leading-relaxed">
+            Candidates who applied to your roles
+          </p>
         </article>
       </div>
 
-      <Link
-        href="/jobs/new"
-        className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-indigo-600 text-white font-semibold shadow-lg shadow-indigo-600/20 hover:bg-indigo-700 transition-colors"
-      >
-        <Plus className="w-5 h-5" />
-        Create New Job
-        <ArrowRight className="w-4 h-4" />
-      </Link>
-    </div>
-  );
-}
-
-function CandidateView() {
-  return (
-    <div className="space-y-8">
-      <div>
-        <h2 className="text-lg font-bold text-slate-900">My Applications</h2>
-        <p className="mt-1 text-sm text-slate-500">
-          Track where each application stands. Data is mock until we wire Supabase.
+      <div className="mt-20">
+        <h2 className="text-2xl font-light tracking-tight">Applications received</h2>
+        <p className="mt-3 max-w-xl text-base font-light leading-relaxed text-muted">
+          Schedule a time and meeting link. The candidate will see it on their
+          dashboard, and their status becomes Interviewing.
         </p>
       </div>
 
-      <ul className="space-y-4">
-        {mockApplications.map((app) => (
-          <li
-            key={app.id}
-            className="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
-          >
-            <div className="flex items-start gap-4">
-              <div className="w-11 h-11 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center flex-shrink-0">
-                <FileText className="w-5 h-5" />
+      {applications.length === 0 ? (
+        <p className="mt-12 text-base font-light text-muted">
+          No applications yet. Post a job, then candidates can apply.
+        </p>
+      ) : (
+        <ul className="mt-12 divide-y divide-line border-y border-line">
+          {applications.map((app) => (
+            <li key={app.id} className="py-10">
+              <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+                <div>
+                  <p className="eyebrow">{app.status}</p>
+                  <p className="mt-3 text-xl font-medium tracking-tight">
+                    {app.job_title}
+                  </p>
+                  <p className="mt-2 text-sm font-light text-muted">
+                    Candidate {app.candidate_id}
+                  </p>
+                  {app.interview ? (
+                    <p className="mt-4 text-sm font-light text-ink">
+                      Interview {formatInterviewTime(app.interview.scheduled_time)}
+                    </p>
+                  ) : null}
+                  {app.resume_url ? (
+                    <a
+                      href={app.resume_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="btn-text mt-4 text-sm"
+                    >
+                      Resume
+                      <ArrowUpRight className="h-3.5 w-3.5" />
+                    </a>
+                  ) : null}
+                </div>
+                <ScheduleInterviewForm
+                  applicationId={app.id}
+                  existing={
+                    app.interview
+                      ? {
+                          scheduled_time: app.interview.scheduled_time,
+                          link: app.interview.link,
+                        }
+                      : null
+                  }
+                />
               </div>
-              <div>
-                <p className="font-semibold text-slate-900">{app.title}</p>
-                <p className="text-sm text-slate-500">{app.company}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 sm:gap-4">
-              <StatusBadge status={app.status} />
-              <span className="inline-flex items-center gap-1.5 text-xs text-slate-400">
-                <Clock className="w-3.5 h-3.5" />
-                {app.updated}
-              </span>
-            </div>
-          </li>
-        ))}
-      </ul>
+            </li>
+          ))}
+        </ul>
+      )}
 
-      <Link
-        href="/jobs"
-        className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-indigo-600 text-white font-semibold shadow-lg shadow-indigo-600/20 hover:bg-indigo-700 transition-colors"
-      >
-        <Search className="w-5 h-5" />
-        Browse Jobs
-        <ArrowRight className="w-4 h-4" />
+      <Link href="/jobs/new" className="btn-primary mt-12">
+        Create a job
+        <ArrowRight className="h-4 w-4" />
       </Link>
     </div>
   );
 }
 
-function StatusBadge({ status }: { status: "Applied" | "Interviewing" }) {
-  const isInterview = status === "Interviewing";
+function CandidateView({
+  applications,
+}: {
+  applications: DashboardApplication[];
+}) {
   return (
-    <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
-        isInterview
-          ? "bg-blue-50 text-blue-700 border border-blue-100"
-          : "bg-slate-100 text-slate-700 border border-slate-200"
-      }`}
-    >
-      {isInterview ? (
-        <CheckCircle2 className="w-3.5 h-3.5" />
+    <div>
+      <div className="max-w-2xl">
+        <h2 className="text-2xl font-light tracking-tight">My applications</h2>
+        <p className="mt-3 text-base font-light text-muted leading-relaxed">
+          Status, interview time, and a link to join when a recruiter schedules
+          you.
+        </p>
+      </div>
+
+      {applications.length === 0 ? (
+        <p className="mt-12 text-base font-light text-muted">
+          You have not applied to any roles yet.
+        </p>
       ) : (
-        <Clock className="w-3.5 h-3.5" />
+        <ul className="mt-12 divide-y divide-line border-y border-line">
+          {applications.map((app) => (
+            <li
+              key={app.id}
+              className="py-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6"
+            >
+              <div>
+                <p className="text-lg font-medium tracking-tight">{app.job_title}</p>
+                <p className="mt-2 text-sm font-light text-muted">{app.status}</p>
+                {app.interview ? (
+                  <p className="mt-3 text-sm font-light text-ink">
+                    {formatInterviewTime(app.interview.scheduled_time)}
+                  </p>
+                ) : null}
+              </div>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                {app.interview?.link ? (
+                  <a
+                    href={app.interview.link}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="btn-primary"
+                  >
+                    Join interview
+                    <ArrowUpRight className="h-4 w-4" />
+                  </a>
+                ) : null}
+                <Link href={`/jobs/${app.job_id}`} className="btn-text">
+                  View role
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+            </li>
+          ))}
+        </ul>
       )}
-      {status}
-    </span>
+
+      <Link href="/jobs" className="btn-text mt-10">
+        Browse jobs
+        <ArrowRight className="h-4 w-4" />
+      </Link>
+    </div>
   );
 }

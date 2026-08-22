@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Briefcase, CircleDot } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { currentUser } from "@clerk/nextjs/server";
 import { supabase } from "@/lib/supabase";
 import ApplyButton from "./ApplyButton";
@@ -20,12 +20,10 @@ export default async function JobDetailPage({
 
   if (error) {
     return (
-      <div className="min-h-screen bg-slate-50">
-        <div className="max-w-3xl mx-auto px-4 py-16">
-          <p className="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-800">
-            Could not load this job. {error.message}
-          </p>
-        </div>
+      <div className="page-shell py-24">
+        <p className="max-w-xl text-base font-light leading-relaxed text-muted">
+          Could not load this job. {error.message}
+        </p>
       </div>
     );
   }
@@ -61,42 +59,28 @@ export default async function JobDetailPage({
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
-        <Link
-          href="/jobs"
-          className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-indigo-600"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to jobs
+    <div>
+      <div className="page-shell py-16 sm:py-24 max-w-3xl">
+        <Link href="/jobs" className="btn-text text-muted hover:text-ink">
+          <ArrowLeft className="h-4 w-4" />
+          All jobs
         </Link>
 
-        <div className="mt-8 bg-white border border-slate-200 rounded-2xl p-6 sm:p-10 shadow-sm">
-          <div className="flex items-center gap-3">
-            <div className="h-12 w-12 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center">
-              <Briefcase className="w-6 h-6" />
-            </div>
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">
-              <CircleDot className="w-3.5 h-3.5" />
-              {job.status}
-            </span>
-          </div>
+        <p className="eyebrow mt-12">{job.status}</p>
+        <h1 className="mt-4 text-4xl sm:text-5xl font-light tracking-tight leading-tight">
+          {job.title}
+        </h1>
+        <p className="mt-10 text-lg font-light leading-[1.75] text-ink/90 whitespace-pre-wrap">
+          {job.description}
+        </p>
 
-          <h1 className="mt-6 text-3xl sm:text-4xl font-bold tracking-tight text-slate-900">
-            {job.title}
-          </h1>
-          <p className="mt-6 text-slate-700 leading-relaxed whitespace-pre-wrap">
-            {job.description}
-          </p>
-
-          <div className="mt-10 pt-8 border-t border-slate-200">
-            <ApplyButton
-              jobId={job.id}
-              isSignedIn={Boolean(user)}
-              alreadyApplied={alreadyApplied}
-              hasResume={hasResume}
-            />
-          </div>
+        <div className="mt-16 pt-12 border-t border-line">
+          <ApplyButton
+            jobId={job.id}
+            isSignedIn={Boolean(user)}
+            alreadyApplied={alreadyApplied}
+            hasResume={hasResume}
+          />
         </div>
       </div>
     </div>

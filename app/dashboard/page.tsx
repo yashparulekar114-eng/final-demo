@@ -1,6 +1,7 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import DashboardClient from "../components/DashboardClient";
+import { loadDashboardData } from "./load";
 
 export default async function DashboardPage() {
   await auth.protect();
@@ -16,6 +17,8 @@ export default async function DashboardPage() {
     user.username ||
     "there";
 
+  const dashboard = await loadDashboardData(user.id);
+
   return (
     <DashboardClient
       user={{
@@ -24,6 +27,11 @@ export default async function DashboardPage() {
         email,
         imageUrl: user.imageUrl,
       }}
+      recruiterApplications={dashboard.recruiterApplications}
+      candidateApplications={dashboard.candidateApplications}
+      openJobCount={dashboard.openJobCount}
+      applicantCount={dashboard.applicantCount}
+      interviewsTableMissing={dashboard.interviewsTableMissing}
     />
   );
 }
