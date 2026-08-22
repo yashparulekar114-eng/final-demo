@@ -58,3 +58,32 @@ create policy "Anyone can insert applications"
   on public.applications
   for insert
   with check (true);
+
+alter table public.applications add column if not exists resume_url text;
+
+drop policy if exists "Anyone can update applications" on public.applications;
+create policy "Anyone can update applications"
+  on public.applications
+  for update
+  using (true)
+  with check (true);
+
+-- Public resumes storage bucket (run in SQL Editor)
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('resumes', 'resumes', true, 5242880, array['application/pdf']::text[])
+on conflict (id) do update
+set public = excluded.public,
+    file_size_limit = excluded.file_size_limit,
+    allowed_mime_types = excluded.allowed_mime_types;
+
+drop policy if exists "Public read resumes" on storage.objects;
+create policy "Public read resumes"
+  on storage.objects
+  for select
+  using (bucket_id = 'resumes');
+
+drop policy if exists "Anyone can upload resumes" on storage.objects;
+create policy "Anyone can upload resumes"
+  on storage.objects
+  for insert
+  with check (bucket_id = 'resumes');

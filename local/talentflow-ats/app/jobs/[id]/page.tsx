@@ -36,15 +36,28 @@ export default async function JobDetailPage({
 
   const user = await currentUser();
   let alreadyApplied = false;
+  let hasResume = false;
 
   if (user) {
-    const { data: application } = await supabase
+    const withResume = await supabase
       .from("applications")
-      .select("id")
+      .select("id, resume_url")
       .eq("job_id", job.id)
       .eq("candidate_id", user.id)
       .maybeSingle();
-    alreadyApplied = Boolean(application);
+
+    if (withResume.error?.message.includes("resume_url")) {
+      const fallback = await supabase
+        .from("applications")
+        .select("id")
+        .eq("job_id", job.id)
+        .eq("candidate_id", user.id)
+        .maybeSingle();
+      alreadyApplied = Boolean(fallback.data);
+    } else {
+      alreadyApplied = Boolean(withResume.data);
+      hasResume = Boolean(withResume.data?.resume_url);
+    }
   }
 
   return (
@@ -81,6 +94,7 @@ export default async function JobDetailPage({
               jobId={job.id}
               isSignedIn={Boolean(user)}
               alreadyApplied={alreadyApplied}
+              hasResume={hasResume}
             />
           </div>
         </div>

@@ -45,6 +45,7 @@ Open [http://localhost:3000](http://localhost:3000) on the same computer.
 Run `database-schema.sql` in the SQL Editor whenever it changes. It creates:
 
 - `jobs`
-- `applications`
+- `applications` (including `resume_url`)
+- public Storage bucket `resumes`
 
-If you skip this, posting jobs or clicking **Apply Now** will fail (`PGRST205`).
+If you skip this, posting jobs, applying, or uploading a PDF will fail.
