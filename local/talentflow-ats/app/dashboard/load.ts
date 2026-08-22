@@ -18,14 +18,6 @@ function missingTable(error: { code?: string; message?: string } | null) {
 export async function loadDashboardData(
   userId: string,
 ): Promise<DashboardData> {
-  const empty: DashboardData = {
-    recruiterApplications: [],
-    candidateApplications: [],
-    openJobCount: 0,
-    applicantCount: 0,
-    interviewsTableMissing: false,
-  };
-
   const { data: recruiterJobs, error: jobsError } = await supabase
     .from("jobs")
     .select("id, title, status")

@@ -28,33 +28,32 @@ export default function JobsManager({ liveJobs }: { liveJobs: LiveJob[] }) {
   const [status, setStatus] = useState<string>("All");
   const [page, setPage] = useState(0);
 
-  const merged: MockJob[] = [
-    ...liveJobs.map((j) => ({
-      id: j.id,
-      title: j.title,
-      department: "General",
-      location: "—",
-      type: "Full-time",
-      salary: "—",
-      manager: "You",
-      status: (j.status === "Open" ? "Active" : "Closed") as JobStatus,
-      posted: new Date(j.created_at).toLocaleDateString(),
-      applicants: 0,
-      description: j.description,
-      requirements: [],
-      skills: [],
-      team: ["You"],
-    })),
-    ...mockJobs,
-  ];
-
   const filtered = useMemo(() => {
+    const merged: MockJob[] = [
+      ...liveJobs.map((j) => ({
+        id: j.id,
+        title: j.title,
+        department: "General",
+        location: "—",
+        type: "Full-time",
+        salary: "—",
+        manager: "You",
+        status: (j.status === "Open" ? "Active" : "Closed") as JobStatus,
+        posted: new Date(j.created_at).toLocaleDateString(),
+        applicants: 0,
+        description: j.description,
+        requirements: [],
+        skills: [],
+        team: ["You"],
+      })),
+      ...mockJobs,
+    ];
     return merged.filter((j) => {
       const hit = `${j.title} ${j.department} ${j.location}`.toLowerCase().includes(q.toLowerCase());
       const st = status === "All" || j.status === status;
       return hit && st;
     });
-  }, [merged, q, status]);
+  }, [liveJobs, q, status]);
 
   const pageSize = 6;
   const pages = Math.max(1, Math.ceil(filtered.length / pageSize));
