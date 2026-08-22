@@ -22,7 +22,7 @@ npm install
 npm run dev
 ```
 
-Or from the standalone copy:
+Or from the standalone copy in **`local/talentflow-ats`**:
 
 ```bash
 cd local/talentflow-ats
