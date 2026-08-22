@@ -1,23 +1,10 @@
-# TalentFlow ATS (local)
+# TalentFlow ATS
 
-All landing-page source for this project lives in this folder. Run it on your computer — not on the cloud VM.
+Applicant tracking system starter (Next.js App Router). Recruiters post jobs and review resumes; candidates search roles and upload resumes.
 
-## Stack
+## Local code
 
-- Next.js (App Router)
-- React
-- TypeScript
-- Tailwind CSS
-- lucide-react
-
-## Files
-
-- `app/page.tsx` — home / landing page
-- `app/layout.tsx` — root layout and metadata
-- `app/globals.css` — Tailwind styles
-- `public/` — static assets
-
-## Run locally
+The full app source is in **`local/talentflow-ats`**. Copy that folder to your computer, or clone this repo and run from there:
 
 ```bash
 cd local/talentflow-ats
@@ -25,4 +12,6 @@ npm install
 npm run dev
 ```
 
-Then open **http://localhost:3000** in your browser (this only works on the same machine where you ran `npm run dev`).
+Open [http://localhost:3000](http://localhost:3000) on **your** machine.
+
+The landing page is `local/talentflow-ats/app/page.tsx`.
