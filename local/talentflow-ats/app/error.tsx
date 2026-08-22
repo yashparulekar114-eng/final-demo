@@ -8,16 +8,13 @@ export default function ErrorPage({
   reset: () => void;
 }) {
   return (
-    <div className="mx-auto max-w-lg px-4 py-20 text-center">
-      <h1 className="text-2xl font-bold text-slate-900">Something went wrong</h1>
-      <p className="mt-3 text-sm text-slate-600">
+    <div className="page-shell py-24 max-w-lg">
+      <p className="eyebrow">Error</p>
+      <h1 className="mt-4 text-3xl font-light tracking-tight">Something went wrong</h1>
+      <p className="mt-4 text-base font-light leading-relaxed text-muted">
         {error.message || "Please try again."}
       </p>
-      <button
-        type="button"
-        onClick={reset}
-        className="mt-6 inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700"
-      >
+      <button type="button" onClick={reset} className="btn-primary mt-10">
         Try again
       </button>
     </div>

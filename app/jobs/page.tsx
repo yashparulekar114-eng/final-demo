@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { Briefcase, ArrowRight, MapPin } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import JobSearchBar from "./JobSearchBar";
 
@@ -30,12 +30,12 @@ export default async function JobsPage({
   ) {
     return (
       <JobsShell query={rawQuery ?? ""}>
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-amber-900">
-          <h2 className="font-bold">Supabase is not configured</h2>
-          <p className="mt-2 text-sm">
-            Copy <code className="font-mono">.env.example</code> to{" "}
-            <code className="font-mono">.env.local</code> and add your project
-            URL and anon key, then restart the app.
+        <div className="py-10">
+          <h2 className="text-xl font-medium tracking-tight">Supabase is not configured</h2>
+          <p className="mt-3 text-base font-light text-muted leading-relaxed">
+            Copy <code className="font-mono text-sm">.env.example</code> to{" "}
+            <code className="font-mono text-sm">.env.local</code> and add your
+            project URL and anon key, then restart the app.
           </p>
         </div>
       </JobsShell>
@@ -62,9 +62,9 @@ export default async function JobsPage({
 
     return (
       <JobsShell query={rawQuery ?? ""}>
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-800">
-          <h2 className="font-bold">Could not load jobs</h2>
-          <p className="mt-2 text-sm">
+        <div className="py-10">
+          <h2 className="text-xl font-medium tracking-tight">Could not load jobs</h2>
+          <p className="mt-3 text-base font-light text-muted leading-relaxed">
             {missingTable
               ? "The jobs table does not exist yet. Open the Supabase SQL Editor and run database-schema.sql, then refresh this page."
               : error.message}
@@ -79,70 +79,51 @@ export default async function JobsPage({
   return (
     <JobsShell query={rawQuery ?? ""}>
       {jobs.length === 0 ? (
-        <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center">
-          <Briefcase className="w-10 h-10 text-slate-300 mx-auto" />
+        <div className="py-16 max-w-lg">
           {query ? (
             <>
-              <h2 className="mt-4 text-lg font-bold text-slate-900">
-                No jobs found
-              </h2>
-              <p className="mt-2 text-sm text-slate-500">
+              <h2 className="text-2xl font-light tracking-tight">No jobs found</h2>
+              <p className="mt-4 text-base font-light text-muted leading-relaxed">
                 Nothing matched “{query}”. Try a different keyword.
               </p>
-              <Link
-                href="/jobs"
-                className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:text-indigo-700"
-              >
+              <Link href="/jobs" className="btn-text mt-8">
                 Clear search
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="h-4 w-4" />
               </Link>
             </>
           ) : (
             <>
-              <h2 className="mt-4 text-lg font-bold text-slate-900">
-                No open jobs yet
-              </h2>
-              <p className="mt-2 text-sm text-slate-500">
+              <h2 className="text-2xl font-light tracking-tight">No open jobs yet</h2>
+              <p className="mt-4 text-base font-light text-muted leading-relaxed">
                 Recruiters can post a role from the dashboard.
               </p>
-              <Link
-                href="/jobs/new"
-                className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:text-indigo-700"
-              >
+              <Link href="/jobs/new" className="btn-text mt-8">
                 Post a job
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="h-4 w-4" />
               </Link>
             </>
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <ul className="divide-y divide-line border-y border-line">
           {jobs.map((job) => (
-            <article
-              key={job.id}
-              className="flex flex-col bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md hover:border-indigo-200 transition-all"
-            >
-              <div className="w-11 h-11 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center mb-4">
-                <Briefcase className="w-5 h-5" />
+            <li key={job.id} className="py-10 sm:py-12">
+              <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+                <div className="max-w-2xl">
+                  <p className="eyebrow">{job.status}</p>
+                  <h2 className="mt-3 text-2xl font-light tracking-tight">{job.title}</h2>
+                  <p className="mt-4 text-base font-light leading-relaxed text-muted line-clamp-3">
+                    {job.description}
+                  </p>
+                </div>
+                <Link href={`/jobs/${job.id}`} className="btn-text shrink-0 mt-1">
+                  View role
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
               </div>
-              <h2 className="text-lg font-bold text-slate-900">{job.title}</h2>
-              <p className="mt-1 inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700">
-                <MapPin className="w-3.5 h-3.5" />
-                {job.status}
-              </p>
-              <p className="mt-3 text-sm text-slate-600 line-clamp-4 flex-grow">
-                {job.description}
-              </p>
-              <Link
-                href={`/jobs/${job.id}`}
-                className="mt-6 inline-flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition-colors"
-              >
-                View / Apply
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </article>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </JobsShell>
   );
@@ -156,17 +137,17 @@ function JobsShell({
   query: string;
 }) {
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
-        <p className="text-sm font-semibold text-indigo-600">Open roles</p>
-        <h1 className="mt-1 text-3xl sm:text-4xl font-bold tracking-tight text-slate-900">
+    <div>
+      <div className="page-shell py-16 sm:py-24">
+        <p className="eyebrow">Open roles</p>
+        <h1 className="mt-4 text-4xl sm:text-5xl font-light tracking-tight">
           Browse jobs
         </h1>
-        <p className="mt-2 text-slate-600 max-w-2xl">
-          Explore open positions posted by recruiters on TalentFlow.
+        <p className="mt-5 max-w-xl text-lg font-light leading-relaxed text-muted">
+          Positions posted by recruiters on TalentFlow.
         </p>
         <JobSearchBar query={query} />
-        <div className="mt-10">{children}</div>
+        <div className="mt-16 sm:mt-20">{children}</div>
       </div>
     </div>
   );

@@ -2,17 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import {
-  Briefcase,
-  Users,
-  Plus,
-  Search,
-  FileText,
-  Clock,
-  CheckCircle2,
-  Building2,
-  ArrowRight,
-} from "lucide-react";
+import { ArrowRight, Clock } from "lucide-react";
+
 type Role = "recruiter" | "candidate";
 
 type DashboardUser = {
@@ -50,46 +41,46 @@ export default function DashboardClient({ user }: { user: DashboardUser }) {
   const [role, setRole] = useState<Role>("recruiter");
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-10">
-          <div>
-            <p className="text-sm font-semibold text-indigo-600">Welcome back</p>
-            <h1 className="mt-1 text-3xl sm:text-4xl font-bold tracking-tight text-slate-900">
+    <div>
+      <main className="page-shell py-16 sm:py-24">
+        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-10">
+          <div className="max-w-xl">
+            <p className="eyebrow">Welcome</p>
+            <h1 className="mt-4 text-4xl sm:text-5xl font-light tracking-tight text-ink">
               {user.name}
             </h1>
-            <p className="mt-2 text-sm text-slate-500">{user.email}</p>
+            <p className="mt-4 text-base font-light text-muted">{user.email}</p>
           </div>
 
-          <div className="inline-flex rounded-xl border border-slate-200 bg-white p-1 shadow-sm self-start">
+          <div className="flex items-center gap-8 self-start">
             <button
               type="button"
               onClick={() => setRole("recruiter")}
-              className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+              className={`text-sm tracking-wide pb-1 border-b transition-colors ${
                 role === "recruiter"
-                  ? "bg-indigo-600 text-white"
-                  : "text-slate-600 hover:text-slate-900"
+                  ? "border-ink text-ink font-medium"
+                  : "border-transparent text-muted hover:text-ink"
               }`}
             >
-              <Building2 className="w-4 h-4" />
               Recruiter
             </button>
             <button
               type="button"
               onClick={() => setRole("candidate")}
-              className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+              className={`text-sm tracking-wide pb-1 border-b transition-colors ${
                 role === "candidate"
-                  ? "bg-indigo-600 text-white"
-                  : "text-slate-600 hover:text-slate-900"
+                  ? "border-ink text-ink font-medium"
+                  : "border-transparent text-muted hover:text-ink"
               }`}
             >
-              <Search className="w-4 h-4" />
               Candidate
             </button>
           </div>
         </div>
 
-        {role === "recruiter" ? <RecruiterView /> : <CandidateView />}
+        <div className="mt-16 sm:mt-20">
+          {role === "recruiter" ? <RecruiterView /> : <CandidateView />}
+        </div>
       </main>
     </div>
   );
@@ -97,34 +88,27 @@ export default function DashboardClient({ user }: { user: DashboardUser }) {
 
 function RecruiterView() {
   return (
-    <div className="space-y-8">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <article className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-          <div className="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center mb-4">
-            <Briefcase className="w-6 h-6" />
-          </div>
-          <p className="text-sm font-medium text-slate-500">Active Jobs</p>
-          <p className="mt-1 text-4xl font-bold tracking-tight text-slate-900">12</p>
-          <p className="mt-2 text-sm text-slate-500">Open roles currently accepting applicants</p>
+    <div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-line border border-line">
+        <article className="bg-surface p-10 sm:p-12">
+          <p className="eyebrow">Active jobs</p>
+          <p className="mt-6 text-5xl font-light tracking-tight">12</p>
+          <p className="mt-4 text-sm font-light text-muted leading-relaxed">
+            Open roles currently accepting applicants
+          </p>
         </article>
-
-        <article className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-          <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center mb-4">
-            <Users className="w-6 h-6" />
-          </div>
-          <p className="text-sm font-medium text-slate-500">Total Candidates</p>
-          <p className="mt-1 text-4xl font-bold tracking-tight text-slate-900">84</p>
-          <p className="mt-2 text-sm text-slate-500">Applicants across all open pipelines</p>
+        <article className="bg-surface p-10 sm:p-12">
+          <p className="eyebrow">Candidates</p>
+          <p className="mt-6 text-5xl font-light tracking-tight">84</p>
+          <p className="mt-4 text-sm font-light text-muted leading-relaxed">
+            Applicants across all open pipelines
+          </p>
         </article>
       </div>
 
-      <Link
-        href="/jobs/new"
-        className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-indigo-600 text-white font-semibold shadow-lg shadow-indigo-600/20 hover:bg-indigo-700 transition-colors"
-      >
-        <Plus className="w-5 h-5" />
-        Create New Job
-        <ArrowRight className="w-4 h-4" />
+      <Link href="/jobs/new" className="btn-primary mt-12">
+        Create a job
+        <ArrowRight className="h-4 w-4" />
       </Link>
     </div>
   );
@@ -132,33 +116,29 @@ function RecruiterView() {
 
 function CandidateView() {
   return (
-    <div className="space-y-8">
-      <div>
-        <h2 className="text-lg font-bold text-slate-900">My Applications</h2>
-        <p className="mt-1 text-sm text-slate-500">
-          Track where each application stands. Data is mock until we wire Supabase.
+    <div>
+      <div className="max-w-2xl">
+        <h2 className="text-2xl font-light tracking-tight">My applications</h2>
+        <p className="mt-3 text-base font-light text-muted leading-relaxed">
+          Track where each application stands. Sample data until live pipeline
+          history is connected.
         </p>
       </div>
 
-      <ul className="space-y-4">
+      <ul className="mt-12 divide-y divide-line border-y border-line">
         {mockApplications.map((app) => (
           <li
             key={app.id}
-            className="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+            className="py-8 flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-3"
           >
-            <div className="flex items-start gap-4">
-              <div className="w-11 h-11 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center flex-shrink-0">
-                <FileText className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="font-semibold text-slate-900">{app.title}</p>
-                <p className="text-sm text-slate-500">{app.company}</p>
-              </div>
+            <div>
+              <p className="text-lg font-medium tracking-tight">{app.title}</p>
+              <p className="mt-1 text-sm font-light text-muted">{app.company}</p>
             </div>
-            <div className="flex items-center gap-3 sm:gap-4">
-              <StatusBadge status={app.status} />
-              <span className="inline-flex items-center gap-1.5 text-xs text-slate-400">
-                <Clock className="w-3.5 h-3.5" />
+            <div className="flex items-center gap-6 text-sm text-muted font-light">
+              <span className="text-ink font-normal">{app.status}</span>
+              <span className="inline-flex items-center gap-1.5">
+                <Clock className="h-3.5 w-3.5" />
                 {app.updated}
               </span>
             </div>
@@ -166,34 +146,10 @@ function CandidateView() {
         ))}
       </ul>
 
-      <Link
-        href="/jobs"
-        className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-indigo-600 text-white font-semibold shadow-lg shadow-indigo-600/20 hover:bg-indigo-700 transition-colors"
-      >
-        <Search className="w-5 h-5" />
-        Browse Jobs
-        <ArrowRight className="w-4 h-4" />
+      <Link href="/jobs" className="btn-text mt-10">
+        Browse jobs
+        <ArrowRight className="h-4 w-4" />
       </Link>
     </div>
-  );
-}
-
-function StatusBadge({ status }: { status: "Applied" | "Interviewing" }) {
-  const isInterview = status === "Interviewing";
-  return (
-    <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
-        isInterview
-          ? "bg-blue-50 text-blue-700 border border-blue-100"
-          : "bg-slate-100 text-slate-700 border border-slate-200"
-      }`}
-    >
-      {isInterview ? (
-        <CheckCircle2 className="w-3.5 h-3.5" />
-      ) : (
-        <Clock className="w-3.5 h-3.5" />
-      )}
-      {status}
-    </span>
   );
 }
