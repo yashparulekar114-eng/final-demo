@@ -35,4 +35,15 @@ Open [http://localhost:3000](http://localhost:3000) on the same computer.
 - Sign in: `/sign-in`
 - Sign up as recruiter: `/sign-up?role=recruiter`
 - Sign up as candidate: `/sign-up?role=candidate`
-- Dashboard (signed in): `/dashboard``
+- Dashboard (signed in): `/dashboard`
+- Browse jobs: `/jobs`
+- Post a job (signed in): `/jobs/new`
+
+## Database (Supabase)
+
+The `jobs` table does **not** exist until you run the schema.
+
+1. Open [Supabase](https://supabase.com/dashboard) → your project → **SQL Editor**
+2. Paste `database-schema.sql` and click **Run**
+
+If you skip this, posting and listing jobs will fail (`PGRST205`).`
