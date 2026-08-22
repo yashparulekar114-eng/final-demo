@@ -87,3 +87,38 @@ create policy "Anyone can upload resumes"
   on storage.objects
   for insert
   with check (bucket_id = 'resumes');
+
+-- Interviews (one scheduled meeting per application)
+create table if not exists public.interviews (
+  id uuid primary key default gen_random_uuid(),
+  application_id uuid not null references public.applications (id) on delete cascade,
+  scheduled_time timestamptz not null,
+  link text not null,
+  status text not null default 'Scheduled',
+  created_at timestamptz not null default now(),
+  constraint interviews_status_check check (status in ('Scheduled', 'Completed', 'Cancelled')),
+  constraint interviews_application_unique unique (application_id)
+);
+
+create index if not exists interviews_application_id_idx on public.interviews (application_id);
+
+alter table public.interviews enable row level security;
+
+drop policy if exists "Anyone can read interviews" on public.interviews;
+create policy "Anyone can read interviews"
+  on public.interviews
+  for select
+  using (true);
+
+drop policy if exists "Anyone can insert interviews" on public.interviews;
+create policy "Anyone can insert interviews"
+  on public.interviews
+  for insert
+  with check (true);
+
+drop policy if exists "Anyone can update interviews" on public.interviews;
+create policy "Anyone can update interviews"
+  on public.interviews
+  for update
+  using (true)
+  with check (true);
